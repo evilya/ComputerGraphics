@@ -7,14 +7,8 @@ import java.awt.event.MouseEvent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-/**
- * Component which draws two diagonal lines and reacts on mouse clicks 
- * @author Vasya Pupkin
- */
 public class InitView extends JPanel {
-	/**
-	 * Constructs object
-	 */
+
 	public InitView()
 	{
 		addMouseListener(new MouseAdapter() {
@@ -25,11 +19,7 @@ public class InitView extends JPanel {
 			}
 		});
 	}
-	
-	/**
-	 * Performs actual component drawing
-	 * @param g Graphics object to draw component to
-	 */
+
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);

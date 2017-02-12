@@ -1,16 +1,9 @@
 package ru.nsu.fit.g14203.evtushenko;
 
 import java.awt.event.KeyEvent;
-
 import javax.swing.JOptionPane;
 
-import ru.nsu.fit.g14203.evtushenko.MainFrame;
-
-
 public class InitMainWindow extends MainFrame {
-	/**
-	 * Default constructor to create main window
-	 */
 	public InitMainWindow()
 	{
 		super(600, 400, "Init application");
@@ -39,7 +32,7 @@ public class InitMainWindow extends MainFrame {
 	 */
 	public void onAbout()
 	{
-		JOptionPane.showMessageDialog(this, "Init, version 1.0\nCopyright © 2010 Vasya Pupkin, FF, group 1234", "About Init", JOptionPane.INFORMATION_MESSAGE);
+		JOptionPane.showMessageDialog(this, "Init, version 1.0\nCopyright ï¿½ 2010 Vasya Pupkin, FF, group 1234", "About Init", JOptionPane.INFORMATION_MESSAGE);
 	}
 	
 	/**
