@@ -1,21 +1,29 @@
 package ru.nsu.fit.g14203.evtushenko;
 
-import java.awt.Graphics;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
+import java.awt.image.BufferedImage;
 
 public class InitView extends JPanel {
+	private BufferedImage img;
+	private Graphics2D graphics;
+	private HexagonDrawer hexagonDrawer;
 
-	public InitView()
-	{
+	public InitView() {
+
+		img = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_ARGB);
+		graphics = img.createGraphics();
+
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				JOptionPane.showMessageDialog(InitView.this,
-						"Clicked on "+e.getX()+","+e.getY());
+				System.out.println("LUL");
+				hexagonDrawer.fill(e.getX(), e.getY(), Color.RED);
+				repaint();
 			}
 		});
 	}
@@ -23,7 +31,17 @@ public class InitView extends JPanel {
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		g.drawLine(0, 0, getBounds().width-1, getBounds().height-1);
-		g.drawLine(0, getBounds().height-1, getBounds().width-1, 0);
+		int size = 25;
+		hexagonDrawer = new HexagonDrawer(img, graphics, 1, size);
+		int offsetX = hexagonDrawer.getOffsetX();
+		int offsetY = hexagonDrawer.getOffsetY();
+		for (int j = 0; j < 10; j++) {
+			int dy = (size + offsetY) * j;
+			for (int i = 0; i < 10 - (j % 2); i++) {
+				int dx = offsetX * i * 2 + (j % 2) * offsetX;
+				hexagonDrawer.draw(25 + dx, 25 + dy);
+			}
+		}
+		g.drawImage(img, 0, 0, null);
 	}
 }
