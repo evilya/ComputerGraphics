@@ -19,6 +19,10 @@ public class SpanFiller implements Filler {
 		int newColor = color.getRGB();
 		int oldColor = image.getRGB(x, y);
 
+		if (newColor == oldColor) {
+			return;
+		}
+
 		Span span = findSpan(x, y, oldColor);
 		spanStack.addLast(span);
 
@@ -26,15 +30,16 @@ public class SpanFiller implements Filler {
 			span = spanStack.removeLast();
 			fillSpan(span, newColor);
 			for (int offsetY = -1; offsetY <= 1; offsetY += 2) {
-				for (int curX = span.getLeftX(); curX <= span.getRightX(); curX++) {
-					Span nextSpan = findSpan(curX, span.getY() + offsetY, oldColor);
-					if (nextSpan != null) {
-						curX = nextSpan.getRightX() + 2; //because +1 is silly
-						spanStack.addLast(nextSpan);
+				if (span.getY() > 0 && span.getY() < image.getHeight()) {
+					for (int curX = span.getLeftX(); curX <= span.getRightX(); curX++) {
+						Span nextSpan = findSpan(curX, span.getY() + offsetY, oldColor);
+						if (nextSpan != null) {
+							curX = nextSpan.getRightX() + 2; //because +1 is silly
+							spanStack.addLast(nextSpan);
+						}
 					}
 				}
 			}
-
 		}
 	}
 

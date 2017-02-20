@@ -9,12 +9,13 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class HexagonDrawer {
-	private Graphics2D graphics;
-	private LineDrawer lineDrawer;
-	private Filler filler;
 	private int lineThickness;
 	private int size;
 	private int offsetX, offsetY;
+
+	private Graphics2D graphics;
+	private LineDrawer lineDrawer;
+	private Filler filler;
 
 	public HexagonDrawer(BufferedImage image, Graphics2D graphics, int lineThickness, int size) {
 		if (size <= 0
@@ -23,11 +24,13 @@ public class HexagonDrawer {
 				|| graphics == null) {
 			throw new IllegalArgumentException();
 		}
+
 		this.graphics = graphics;
 		this.lineThickness = lineThickness;
+		setSize(size);
+
 		lineDrawer = new BresenhamLineDrawer(image, new Color(Integer.MIN_VALUE));
 		filler = new SpanFiller(image);
-		setSize(size);
 	}
 
 	public void fill(int x, int y, Color color) {
@@ -37,7 +40,7 @@ public class HexagonDrawer {
 	public void draw(int centerX, int centerY) {
 		if (lineThickness > 1) {
 			graphics.setStroke(new BasicStroke(lineThickness));
-			graphics.setColor(new Color(Integer.MIN_VALUE));
+			graphics.setColor(Color.BLACK);
 		}
 		drawLine(centerX, centerY - size, centerX + offsetX, centerY - offsetY);
 		drawLine(centerX + offsetX, centerY - offsetY, centerX + offsetX, centerY + offsetY);
