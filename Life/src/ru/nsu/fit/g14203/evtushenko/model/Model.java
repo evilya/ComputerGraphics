@@ -6,21 +6,17 @@ import java.util.Scanner;
 
 public class Model {
 	public static void main(String[] args) {
-		try {
-			Model a = new Model();
-			a.update();
-			a.update();
-			for (int y = 0; y < a.height; y++) {
-				if (y % 2 == 1) {
-					System.out.print("  ");
-				}
-				for (int x = 0; x < a.width - y % 2; x++) {
-					System.out.printf("%.1f ", a.prevCells[y][x].getImpact());
-				}
-				System.out.println();
+		Model a = new Model();
+		a.step();
+		a.step();
+		for (int y = 0; y < a.height; y++) {
+			if (y % 2 == 1) {
+				System.out.print("  ");
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
+			for (int x = 0; x < a.width - y % 2; x++) {
+				System.out.printf("%.1f ", a.prevCells[y][x].getImpact());
+			}
+			System.out.println();
 		}
 	}
 
@@ -53,8 +49,16 @@ public class Model {
 					{0, 2}, {2, 1}, {2, -1}}
 	};
 
-	public Model() throws IOException {
-		try (Scanner scanner = new Scanner(new FileReader("data/in.txt"))) {
+	public Model() {
+		width = 10;
+		height = 10;
+		initField();
+		lineThickness = 2;
+		cellSize = 25;
+	}
+
+	public Model(String file) throws IOException {
+		try (Scanner scanner = new Scanner(new FileReader(file))) {
 			width = scanner.nextInt();
 			height = scanner.nextInt();
 
@@ -95,7 +99,11 @@ public class Model {
 		}
 	}
 
-	public void update() {
+	public Cell[][] getPrevCells() {
+		return prevCells;
+	}
+
+	public void step() {
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width - y % 2; x++) {
 				calculateCellImpact(x, y);
@@ -144,5 +152,85 @@ public class Model {
 		}
 		impact += aliveCount * secondImpact;
 		prevCells[y][x].setImpact(impact);
+	}
+
+	public double getFirstImpact() {
+		return firstImpact;
+	}
+
+	public void setFirstImpact(double firstImpact) {
+		this.firstImpact = firstImpact;
+	}
+
+	public double getSecondImpact() {
+		return secondImpact;
+	}
+
+	public void setSecondImpact(double secondImpact) {
+		this.secondImpact = secondImpact;
+	}
+
+	public double getLiveBegin() {
+		return liveBegin;
+	}
+
+	public void setLiveBegin(double liveBegin) {
+		this.liveBegin = liveBegin;
+	}
+
+	public double getLiveEnd() {
+		return liveEnd;
+	}
+
+	public void setLiveEnd(double liveEnd) {
+		this.liveEnd = liveEnd;
+	}
+
+	public double getBirthBegin() {
+		return birthBegin;
+	}
+
+	public void setBirthBegin(double birthBegin) {
+		this.birthBegin = birthBegin;
+	}
+
+	public double getBirthEnd() {
+		return birthEnd;
+	}
+
+	public void setBirthEnd(double birthEnd) {
+		this.birthEnd = birthEnd;
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public void setWidth(int width) {
+		this.width = width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
+	}
+
+	public int getCellSize() {
+		return cellSize;
+	}
+
+	public void setCellSize(int cellSize) {
+		this.cellSize = cellSize;
+	}
+
+	public int getLineThickness() {
+		return lineThickness;
+	}
+
+	public void setLineThickness(int lineThickness) {
+		this.lineThickness = lineThickness;
 	}
 }

@@ -1,5 +1,6 @@
 package ru.nsu.fit.g14203.evtushenko;
 
+import ru.nsu.fit.g14203.evtushenko.model.Cell;
 import ru.nsu.fit.g14203.evtushenko.model.Model;
 
 import javax.swing.*;
@@ -8,37 +9,22 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 
 public class InitView extends JPanel {
 	private BufferedImage img;
 	private Graphics2D graphics;
 	private HexagonDrawer hexagonDrawer;
+	private Model model;
 	private int cellSize;
+	private int lineThickness;
 	private int width;
 	private int height;
 	private int offsetX;
 	private int offsetY;
 
-	public InitView() {
+	public InitView(Model model) {
+		setModel(model);
 
-		this.height = 400;
-		this.width = 600;
-		cellSize = 25;
-
-		img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-		graphics = img.createGraphics();
-		hexagonDrawer = new HexagonDrawer(img, graphics, 5, cellSize);
-
-		offsetX = hexagonDrawer.getOffsetX();
-		offsetY = hexagonDrawer.getOffsetY();
-		for (int j = 0; j < 10; j++) {
-			int dy = (cellSize + offsetY) * j;
-			for (int i = 0; i < 10 - (j % 2); i++) {
-				int dx = offsetX * (i * 2 + (j % 2));
-				hexagonDrawer.draw(offsetX + dx, cellSize + dy);
-			}
-		}
 		addMouseMotionListener(new MouseMotionAdapter() {
 			@Override
 			public void mouseDragged(MouseEvent e) {
@@ -50,6 +36,7 @@ public class InitView extends JPanel {
 				if (e.getY() >= 0 && e.getY() < maxY && e.getX() >= 0 && e.getX() < maxX) {
 					hexagonDrawer.fill(e.getX(), e.getY(), Color.RED);
 					Position hex = pixelToHex(e.getX(), e.getY());
+					model.getPrevCells()[hex.getY()][hex.getX()].setAlive(true);
 					System.out.println(hex.getX() + " " + hex.getY());
 					repaint();
 				}
@@ -69,10 +56,22 @@ public class InitView extends JPanel {
 
 				Position hex = pixelToHex(x, y);
 				System.out.println(hex.getX() + " " + hex.getY());
-//				System.out.println(p + " " + q);
 				repaint();
 			}
 		});
+	}
+
+	public void update() {
+		Cell[][] cells = model.getPrevCells();
+		for (int j = 0; j < model.getHeight(); j++) {
+			int dy = (cellSize + offsetY) * j;
+			for (int i = 0; i < model.getWidth() - (j % 2); i++) {
+				int dx = lineThickness / 2 + offsetX * (i * 2 + (j % 2));
+				if (cells[j][i].isAlive()) {
+					hexagonDrawer.fill(offsetX + dx, cellSize + dy, Color.RED);
+				}
+			}
+		}
 	}
 
 	@Override
@@ -155,6 +154,28 @@ public class InitView extends JPanel {
 				break;
 		}
 		return new Position(a, b);
+	}
+
+	public void setModel(Model model) {
+		this.model = model;
+		this.offsetX = model.getCellSize() * 866 / 1000;
+		this.offsetY = model.getCellSize() / 2;
+		this.lineThickness = model.getLineThickness();
+		this.height = offsetY * 3 * model.getHeight() + 2 * offsetY;
+		this.width = offsetX * 2 * model.getWidth() + lineThickness;
+		this.cellSize = model.getCellSize();
+
+		img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+		graphics = img.createGraphics();
+		hexagonDrawer = new HexagonDrawer(img, graphics, lineThickness, cellSize);
+
+		for (int j = 0; j < model.getHeight(); j++) {
+			int dy = (cellSize + offsetY) * j;
+			for (int i = 0; i < model.getWidth() - (j % 2); i++) {
+				int dx = lineThickness / 2 + offsetX * (i * 2 + (j % 2));
+				hexagonDrawer.draw(offsetX + dx, cellSize + dy);
+			}
+		}
 	}
 
 }

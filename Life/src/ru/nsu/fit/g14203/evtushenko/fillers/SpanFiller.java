@@ -2,13 +2,14 @@ package ru.nsu.fit.g14203.evtushenko.fillers;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.LinkedList;
 
 public class SpanFiller implements Filler {
 
 	private final BufferedImage image;
-	private Deque<Span> spanStack = new LinkedList<>();
+	private Deque<Span> spanStack = new ArrayDeque<>();
 
 	public SpanFiller(BufferedImage image) {
 		this.image = image;
@@ -65,7 +66,7 @@ public class SpanFiller implements Filler {
 		}
 	}
 
-	private static class Span {
+	private static final class Span {
 		private final int leftX;
 		private final int rightX;
 		private final int y;
