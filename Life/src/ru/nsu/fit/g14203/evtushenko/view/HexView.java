@@ -171,7 +171,11 @@ public class HexView extends JPanel implements Observer {
 				}
 				break;
 			case 3:
-				a = (p - 1) / 2;
+				if (p == 0){
+					a = -1;
+				} else {
+					a = (p - 1) / 2;
+				}
 				b = q / 2;
 				break;
 		}
@@ -226,7 +230,6 @@ public class HexView extends JPanel implements Observer {
 			repaint();
 		}
 	}
-
 
 
 	@Override

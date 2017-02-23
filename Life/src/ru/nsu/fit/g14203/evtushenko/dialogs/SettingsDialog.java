@@ -94,6 +94,7 @@ public class SettingsDialog extends JDialog {
 				model.setLineThickness(lineThicknessSlider.getValue());
 				model.setCellSize(cellSizeSlider.getValue());
 				model.setXorFill(xorReplacePanel.isXor());
+				//TODO
 				setVisible(false);
 				dispose();
 			} else {

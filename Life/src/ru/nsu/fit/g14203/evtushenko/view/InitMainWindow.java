@@ -40,16 +40,6 @@ public class InitMainWindow extends MainFrame {
 			addSubMenu("Help", KeyEvent.VK_H);
 			addMenuItem("Help/About", "Show program version and copyright information", KeyEvent.VK_A, "about.png", "onAbout");
 
-			JRadioButtonMenuItem lal = new JRadioButtonMenuItem("lal");
-			JRadioButtonMenuItem lul = new JRadioButtonMenuItem("lul");
-
-			ButtonGroup group = new ButtonGroup();
-			group.add(lal);
-			group.add(lul);
-
-			((JPopupMenu) getMenuElement("File").getComponent()).add(lal);
-			((JPopupMenu) getMenuElement("File").getComponent()).add(lul);
-
 			addToolBarButton("File/New");
 			addToolBarButton("File/Open");
 			addToolBarButton("File/Save");
@@ -63,10 +53,6 @@ public class InitMainWindow extends MainFrame {
 			addToolBarSeparator();
 			addToolBarButton("File/Exit");
 			addToolBarButton("Help/About");
-
-//			getMenuElement("Game/Next").getComponent().setEnabled(false);
-//			Component[] components = toolBar.getComponents();
-//			components[4].setEnabled(false);
 
 			timer = new Timer(1000, e -> onNext());
 
@@ -84,7 +70,7 @@ public class InitMainWindow extends MainFrame {
 	}
 
 	public void onImpactShow() {
-
+		//TODO
 	}
 
 	public void onSettings() {

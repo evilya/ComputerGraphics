@@ -58,25 +58,9 @@ public class HexagonDrawer {
 		}
 	}
 
-	public int getLineThickness() {
-		return lineThickness;
-	}
-
-	public void setLineThickness(int lineThickness) {
-		if (lineThickness <= 0) {
-			throw new IllegalArgumentException("Incorrect thickness");
-		}
-		this.lineThickness = lineThickness;
-	}
-
 	public void setSize(int size) {
 		this.size = size;
 		offsetX = size * 866 / 1000;
 		offsetY = size / 2;
 	}
-
-	public int getSize() {
-		return size;
-	}
-
 }
