@@ -117,7 +117,7 @@ public class Model extends Observable {
 		return cells[y][x].getImpact();
 	}
 
-	private void updateImpacts(){
+	public void updateImpacts(){
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width - y % 2; x++) {
 				calculateCellImpact(x, y);
@@ -271,4 +271,5 @@ public class Model extends Observable {
 	public void setXorFill(boolean xorFill) {
 		this.xorFill = xorFill;
 	}
+
 }

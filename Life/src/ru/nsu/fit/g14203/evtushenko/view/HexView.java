@@ -11,15 +11,19 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
+import java.text.DecimalFormat;
 
 public class HexView extends JPanel implements Observer {
 	private final Color backgroundColor = Color.WHITE;
 	private final Color cellColor = Color.GREEN;
 	private final Color borderColor = Color.BLACK;
+	private final Color transparentColor = new Color(0, 0, 0, 0);
+	private final Font impactFont = new Font("TimesRoman", Font.PLAIN, 12);
+	private final DecimalFormat impactFormat = new DecimalFormat("#.#");;
 
+	private Model model;
 	private BufferedImage img;
 	private HexagonDrawer hexagonDrawer;
-	private Model model;
 
 	private int width;
 	private int height;
@@ -27,9 +31,13 @@ public class HexView extends JPanel implements Observer {
 	private int lineThickness;
 	private int offsetX;
 	private int offsetY;
+	private boolean showImpact = false;
 
 	private int lastFillX = -1;
 	private int lastFillY = -1;
+
+	private BufferedImage labelsImg;
+	private Graphics2D labelsGraphics;
 
 	public HexView(Model model) {
 		this.model = model;
@@ -41,7 +49,7 @@ public class HexView extends JPanel implements Observer {
 				if (model.isXorFill()) {
 					checkAndFillXor(e);
 				} else {
-				checkAndFill(e);
+					checkAndFill(e);
 				}
 			}
 
@@ -65,6 +73,24 @@ public class HexView extends JPanel implements Observer {
 		});
 	}
 
+	public void updateImpacts() {
+		labelsGraphics.setBackground(transparentColor);
+		labelsGraphics.clearRect(0, 0, width, height);
+		labelsGraphics.setColor(Color.BLACK);
+		labelsGraphics.setFont(impactFont);
+		model.updateImpacts();
+		for (int j = 0; j < model.getHeight(); j++) {
+			int dy = (cellSize + offsetY) * j;
+			for (int i = 0; i < model.getWidth() - (j % 2); i++) {
+				int dx = lineThickness / 2 + offsetX * (i * 2 + (j % 2));
+				labelsGraphics.drawString(
+						impactFormat.format(model.getCellImpact(i, j)),
+						offsetX + dx,
+						cellSize + dy);
+			}
+		}
+	}
+
 
 	public void updateCells() {
 		for (int j = 0; j < model.getHeight(); j++) {
@@ -86,6 +112,7 @@ public class HexView extends JPanel implements Observer {
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		g.drawImage(img, 0, 0, null);
+		g.drawImage(labelsImg, 0, 0, null);
 	}
 
 	@Override
@@ -98,13 +125,15 @@ public class HexView extends JPanel implements Observer {
 		this.lineThickness = model.getLineThickness();
 
 		this.offsetX = cellSize * 866 / 1000; //sin(60)
-		this.offsetY = cellSize / 2;
+		this.offsetY = cellSize / 2; //sin(30)
 
 		this.height = (cellSize + offsetY) * model.getHeight() + cellSize;
 		this.width = offsetX * 2 * model.getWidth() + lineThickness;
 
 		img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+		labelsImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D graphics = img.createGraphics();
+		labelsGraphics = labelsImg.createGraphics();
 		hexagonDrawer = new HexagonDrawer(img, graphics, lineThickness, cellSize);
 
 		for (int j = 0; j < model.getHeight(); j++) {
@@ -171,7 +200,7 @@ public class HexView extends JPanel implements Observer {
 				}
 				break;
 			case 3:
-				if (p == 0){
+				if (p == 0) {
 					a = -1;
 				} else {
 					a = (p - 1) / 2;
@@ -240,10 +269,28 @@ public class HexView extends JPanel implements Observer {
 				break;
 			case UPDATE_CELLS:
 				updateCells();
+				if (showImpact) {
+					updateImpacts();
+				}
 				break;
 		}
 		repaint();
 		getParent().validate();
 		getParent().repaint();
+	}
+
+	public boolean isShowImpact() {
+		return showImpact;
+	}
+
+	public void setShowImpact(boolean showImpact) {
+		this.showImpact = showImpact;
+		if (showImpact) {
+			updateImpacts();
+		} else {
+			labelsGraphics.setBackground(transparentColor);
+			labelsGraphics.clearRect(0, 0, width, height);
+		}
+		repaint();
 	}
 }

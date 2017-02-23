@@ -70,7 +70,11 @@ public class InitMainWindow extends MainFrame {
 	}
 
 	public void onImpactShow() {
-		//TODO
+		if (view.isShowImpact()){
+			view.setShowImpact(false);
+		} else {
+			view.setShowImpact(true);
+		}
 	}
 
 	public void onSettings() {
@@ -101,6 +105,7 @@ public class InitMainWindow extends MainFrame {
 	}
 
 	public void onExit() {
+		//TODO: Save
 		System.exit(0);
 	}
 

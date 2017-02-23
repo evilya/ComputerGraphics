@@ -27,7 +27,9 @@ public class HexagonDrawer {
 
 		this.graphics = graphics;
 		this.lineThickness = lineThickness;
-		setSize(size);
+		this.size = size;
+		this.offsetX = size * 866 / 1000;
+		this.offsetY = size / 2;
 
 		lineDrawer = new BresenhamLineDrawer(image, new Color(Integer.MIN_VALUE));
 		filler = new SpanFiller(image);
@@ -56,11 +58,5 @@ public class HexagonDrawer {
 		} else if (lineThickness == 1) {
 			lineDrawer.drawLine(x1, y1, x2, y2);
 		}
-	}
-
-	public void setSize(int size) {
-		this.size = size;
-		offsetX = size * 866 / 1000;
-		offsetY = size / 2;
 	}
 }
