@@ -4,7 +4,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.LinkedList;
 
 public class SpanFiller implements Filler {
 
@@ -30,17 +29,23 @@ public class SpanFiller implements Filler {
 		while (!spanStack.isEmpty()) {
 			span = spanStack.removeLast();
 			fillSpan(span, newColor);
-			for (int offsetY = -1; offsetY <= 1; offsetY += 2) {
-				if (span.getY() > 0 && span.getY() < image.getHeight()) {
-					for (int curX = span.getLeftX(); curX <= span.getRightX(); curX++) {
-						Span nextSpan = findSpan(curX, span.getY() + offsetY, oldColor);
-						if (nextSpan != null) {
-							curX = nextSpan.getRightX() + 2; //because +1 is silly
-							spanStack.addLast(nextSpan);
-						}
+			if (span.getY() > 0 && span.getY() < image.getHeight() - 1) {
+				for (int curX = span.getLeftX(); curX <= span.getRightX(); curX++) {
+					Span nextSpan = findSpan(curX, span.getY() + 1, oldColor);
+					if (nextSpan != null) {
+						curX = nextSpan.getRightX() + 2; //because +1 is silly
+						spanStack.addLast(nextSpan);
+					}
+				}
+				for (int curX = span.getLeftX(); curX <= span.getRightX(); curX++) {
+					Span nextSpan = findSpan(curX, span.getY() - 1, oldColor);
+					if (nextSpan != null) {
+						curX = nextSpan.getRightX() + 2;
+						spanStack.addLast(nextSpan);
 					}
 				}
 			}
+
 		}
 	}
 

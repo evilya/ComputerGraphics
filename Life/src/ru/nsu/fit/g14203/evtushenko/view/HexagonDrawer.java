@@ -1,4 +1,4 @@
-package ru.nsu.fit.g14203.evtushenko;
+package ru.nsu.fit.g14203.evtushenko.view;
 
 import ru.nsu.fit.g14203.evtushenko.fillers.Filler;
 import ru.nsu.fit.g14203.evtushenko.fillers.SpanFiller;
@@ -79,11 +79,4 @@ public class HexagonDrawer {
 		return size;
 	}
 
-	public int getOffsetX() {
-		return offsetX;
-	}
-
-	public int getOffsetY() {
-		return offsetY;
-	}
 }

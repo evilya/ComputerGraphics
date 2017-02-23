@@ -1,4 +1,4 @@
-package ru.nsu.fit.g14203.evtushenko;
+package ru.nsu.fit.g14203.evtushenko.model;
 
 public class Position {
 	private final int x;

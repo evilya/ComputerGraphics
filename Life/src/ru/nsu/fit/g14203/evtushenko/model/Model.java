@@ -1,25 +1,13 @@
 package ru.nsu.fit.g14203.evtushenko.model;
 
+import ru.nsu.fit.g14203.evtushenko.EventType;
+import ru.nsu.fit.g14203.evtushenko.Observable;
+
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
 
-public class Model {
-	public static void main(String[] args) {
-		Model a = new Model();
-		a.step();
-		a.step();
-		for (int y = 0; y < a.height; y++) {
-			if (y % 2 == 1) {
-				System.out.print("  ");
-			}
-			for (int x = 0; x < a.width - y % 2; x++) {
-				System.out.printf("%.1f ", a.prevCells[y][x].getImpact());
-			}
-			System.out.println();
-		}
-	}
-
+public class Model extends Observable {
 	private double firstImpact = 1.;
 	private double secondImpact = 0.3;
 	private double liveBegin = 2.;
@@ -27,13 +15,14 @@ public class Model {
 	private double birthBegin = 2.3;
 	private double birthEnd = 2.9;
 
+	private boolean xorFill = false;
 
 	private int width;
 	private int height;
 	private int cellSize;
 	private int lineThickness;
 
-	private Cell[][] prevCells;
+	private Cell[][] cells;
 
 	private int[][][] firstImpactOffsets = {
 			{{1, 0}, {0, -1}, {-1, -1},
@@ -51,13 +40,13 @@ public class Model {
 
 	public Model() {
 		width = 10;
-		height = 10;
-		initField();
+		height = 7;
 		lineThickness = 2;
 		cellSize = 25;
+		initField();
 	}
 
-	public Model(String file) throws IOException {
+	public void loadFromFile(String file) throws IOException {
 		try (Scanner scanner = new Scanner(new FileReader(file))) {
 			width = scanner.nextInt();
 			height = scanner.nextInt();
@@ -81,45 +70,85 @@ public class Model {
 				if (x < 0 || x + y % 2 >= width || y < 0 || y >= height) {
 					throw new IOException("Incorrect alive cell position");
 				}
-				prevCells[y][x].setAlive(true);
+				cells[y][x].setAlive(true);
 			}
+			notifyObservers(EventType.RESIZE);
+			notifyObservers(EventType.UPDATE_CELLS);
 		}
 
 	}
 
-	private void initField() {
-		prevCells = new Cell[height][];
+	public void initField() {
+		cells = new Cell[height][];
 		for (int y = 0; y < height; y++) {
-			prevCells[y] = new Cell[width - y % 2];
+			cells[y] = new Cell[width - y % 2];
 		}
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width - y % 2; x++) {
-				prevCells[y][x] = new Cell();
+				cells[y][x] = new Cell();
 			}
 		}
 	}
 
-	public Cell[][] getPrevCells() {
-		return prevCells;
+	public Cell[][] getCells() {
+		return cells;
 	}
 
-	public void step() {
+	public void setCellState(int x, int y, boolean alive) {
+		if (x < 0 || x + y % 2 >= width || y < 0 || y >= height) {
+			throw new RuntimeException("Incorrect cell position");
+		}
+		cells[y][x].setAlive(alive);
+		updateImpacts();
+		notifyObservers(EventType.UPDATE_CELLS);
+	}
+
+	public boolean getCellState(int x, int y){
+		if (x < 0 || x + y % 2 >= width || y < 0 || y >= height) {
+			throw new RuntimeException("Incorrect cell position");
+		}
+		return cells[y][x].isAlive();
+	}
+
+	public double getCellImpact(int x, int y){
+		if (x < 0 || x + y % 2 >= width || y < 0 || y >= height) {
+			throw new RuntimeException("Incorrect cell position");
+		}
+		return cells[y][x].getImpact();
+	}
+
+	private void updateImpacts(){
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width - y % 2; x++) {
 				calculateCellImpact(x, y);
 			}
 		}
+	}
+
+	public void next() {
+		updateImpacts();
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width - y % 2; x++) {
-				double impact = prevCells[y][x].getImpact();
-				boolean alive = prevCells[y][x].isAlive();
+				double impact = cells[y][x].getImpact();
+				boolean alive = cells[y][x].isAlive();
 				if (alive && !(liveBegin <= impact && impact <= liveEnd)) {
-					prevCells[y][x].setAlive(false);
+					cells[y][x].setAlive(false);
 				} else if (!alive && birthBegin <= impact && impact <= birthEnd) {
-					prevCells[y][x].setAlive(true);
+					cells[y][x].setAlive(true);
 				}
 			}
 		}
+		notifyObservers(EventType.UPDATE_CELLS);
+	}
+
+	public void clear(){
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width - y % 2; x++) {
+				cells[y][x].setAlive(false);
+			}
+		}
+		updateImpacts();
+		notifyObservers(EventType.UPDATE_CELLS);
 	}
 
 	private void calculateCellImpact(final int x, final int y) {
@@ -133,7 +162,7 @@ public class Model {
 			if (curX + curY % 2 >= width || curX < 0 || curY >= height || curY < 0) {
 				continue;
 			}
-			if (prevCells[curY][curX].isAlive()) {
+			if (cells[curY][curX].isAlive()) {
 				aliveCount++;
 			}
 		}
@@ -146,12 +175,12 @@ public class Model {
 			if (curX + curY % 2 >= width || curX < 0 || curY >= height || curY < 0) {
 				continue;
 			}
-			if (prevCells[curY][curX].isAlive()) {
+			if (cells[curY][curX].isAlive()) {
 				aliveCount++;
 			}
 		}
 		impact += aliveCount * secondImpact;
-		prevCells[y][x].setImpact(impact);
+		cells[y][x].setImpact(impact);
 	}
 
 	public double getFirstImpact() {
@@ -206,16 +235,15 @@ public class Model {
 		return width;
 	}
 
-	public void setWidth(int width) {
-		this.width = width;
-	}
-
 	public int getHeight() {
 		return height;
 	}
 
-	public void setHeight(int height) {
+	public void setWidthHeight(int width, int height){
+		this.width = width;
 		this.height = height;
+		initField();
+		notifyObservers(EventType.RESIZE);
 	}
 
 	public int getCellSize() {
@@ -224,6 +252,7 @@ public class Model {
 
 	public void setCellSize(int cellSize) {
 		this.cellSize = cellSize;
+		notifyObservers(EventType.RESIZE);
 	}
 
 	public int getLineThickness() {
@@ -232,5 +261,14 @@ public class Model {
 
 	public void setLineThickness(int lineThickness) {
 		this.lineThickness = lineThickness;
+		notifyObservers(EventType.RESIZE);
+	}
+
+	public boolean isXorFill() {
+		return xorFill;
+	}
+
+	public void setXorFill(boolean xorFill) {
+		this.xorFill = xorFill;
 	}
 }

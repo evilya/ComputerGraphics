@@ -1,16 +1,13 @@
 package ru.nsu.fit.g14203.evtushenko.utils;
 
-import ru.nsu.fit.g14203.evtushenko.MainFrame;
-import ru.nsu.fit.g14203.evtushenko.utils.ExtensionFileFilter;
+import ru.nsu.fit.g14203.evtushenko.view.MainFrame;
 
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
-
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.filechooser.FileFilter;
 
 public class FileUtils {
 	private static File dataDirectory = null;

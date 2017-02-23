@@ -1,16 +1,17 @@
-package ru.nsu.fit.g14203.evtushenko;
+package ru.nsu.fit.g14203.evtushenko.view;
 
 import ru.nsu.fit.g14203.evtushenko.utils.FileUtils;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.security.InvalidParameterException;
 
 public class MainFrame extends JFrame {
-	private static final long serialVersionUID = 1L;
 	private JMenuBar menuBar;
 	protected JToolBar toolBar;
 
@@ -44,7 +45,13 @@ public class MainFrame extends JFrame {
 		item.setMnemonic(mnemonic);
 		item.setToolTipText(tooltip);
 		if (icon != null) {
-			item.setIcon(new ImageIcon(getClass().getResource("resources/" + icon), title));
+			try {
+				Image image = ImageIO.read(getClass().getResource("/" + icon));
+				image = image.getScaledInstance(30, 30, 0);
+				ImageIcon imageIcon = new ImageIcon(image, title);
+				item.setIcon(imageIcon);
+			} catch (IOException ignore) {
+			}
 		}
 		final Method method = getClass().getMethod(actionMethod);
 		item.addActionListener(evt -> {
