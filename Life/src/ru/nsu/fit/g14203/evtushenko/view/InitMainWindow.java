@@ -69,6 +69,11 @@ public class InitMainWindow extends MainFrame {
 
 	}
 
+	public static void main(String[] args) {
+		InitMainWindow mainFrame = new InitMainWindow();
+		mainFrame.setVisible(true);
+	}
+
 	public void onImpactShow() {
 		if (view.isShowImpact()){
 			view.setShowImpact(false);
@@ -115,7 +120,7 @@ public class InitMainWindow extends MainFrame {
 	}
 
 	public void onOpen() {
-		JFileChooser fileChooser = new JFileChooser("data");
+		JFileChooser fileChooser = new JFileChooser("FIT_14203_Evtushenko_Ilya_Life_Data");
 		int res = fileChooser.showDialog(this, "Open");
 		if (res == JFileChooser.APPROVE_OPTION) {
 			try {
@@ -128,7 +133,7 @@ public class InitMainWindow extends MainFrame {
 	}
 
 	public void onSave() {
-		JFileChooser fileChooser = new JFileChooser("data");
+		JFileChooser fileChooser = new JFileChooser("FIT_14203_Evtushenko_Ilya_Life_Data");
 		int res = fileChooser.showDialog(this, "Save");
 		if (res == JFileChooser.APPROVE_OPTION) {
 			try {
@@ -165,10 +170,5 @@ public class InitMainWindow extends MainFrame {
 
 	public Model getModel() {
 		return model;
-	}
-
-	public static void main(String[] args) {
-		InitMainWindow mainFrame = new InitMainWindow();
-		mainFrame.setVisible(true);
 	}
 }

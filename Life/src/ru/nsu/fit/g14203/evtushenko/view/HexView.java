@@ -19,7 +19,7 @@ public class HexView extends JPanel implements Observer {
 	private final Color borderColor = Color.BLACK;
 	private final Color transparentColor = new Color(0, 0, 0, 0);
 	private final Font impactFont = new Font("TimesRoman", Font.PLAIN, 12);
-	private final DecimalFormat impactFormat = new DecimalFormat("#.#");;
+	private final DecimalFormat impactFormat = new DecimalFormat("#.#");
 
 	private Model model;
 	private BufferedImage img;
