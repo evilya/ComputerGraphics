@@ -53,7 +53,7 @@ public class CreationDialog extends JDialog {
 
 		okButton.addActionListener(e -> {
 			Model model = ((InitMainWindow) owner).getModel();
-			model.setWidthHeight(Integer.parseInt(widthField.getText()),
+			model.createEmptyField(Integer.parseInt(widthField.getText()),
 					Integer.parseInt(heightField.getText()));
 			setVisible(false);
 			dispose();

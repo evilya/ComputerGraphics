@@ -1,7 +1,12 @@
 package ru.nsu.fit.g14203.evtushenko.dialogs.panels;
 
 import javax.swing.*;
+import javax.swing.text.NumberFormatter;
 import java.awt.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.text.DecimalFormat;
 
 public class WidthHeightPanel extends JPanel {
@@ -16,11 +21,26 @@ public class WidthHeightPanel extends JPanel {
 		JLabel widthLabel = new JLabel("Width:");
 		JLabel heightLabel = new JLabel("Height:");
 
-		widthField = new JFormattedTextField(new DecimalFormat("#"));
-		heightField = new JFormattedTextField(new DecimalFormat("#"));
+		KeyAdapter keyAdapter = new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+				if (!Character.isDigit(e.getKeyChar())){
+					e.consume();
+				}
+			}
+		};
 
-		widthField.setText(width+"");
-		heightField.setText(height+"");
+		NumberFormatter formatter = new NumberFormatter();
+		formatter.setMinimum(1);
+		formatter.setMaximum(100);
+		widthField = new JFormattedTextField(formatter);
+		heightField = new JFormattedTextField(formatter);
+
+		widthField.addKeyListener(keyAdapter);
+		heightField.addKeyListener(keyAdapter);
+
+		widthField.setValue(width);
+		heightField.setValue(height);
 
 		add(widthLabel);
 		add(widthField);
@@ -29,11 +49,11 @@ public class WidthHeightPanel extends JPanel {
 
 	}
 
-	public int getWidthValue(){
+	public int getWidthValue() {
 		return Integer.parseInt(widthField.getText());
 	}
 
-	public int getHeightValue(){
+	public int getHeightValue() {
 		return Integer.parseInt(heightField.getText());
 	}
 }

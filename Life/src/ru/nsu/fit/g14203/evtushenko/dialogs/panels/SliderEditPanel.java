@@ -1,9 +1,12 @@
 package ru.nsu.fit.g14203.evtushenko.dialogs.panels;
 
 import javax.swing.*;
+import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.text.DecimalFormat;
 
 public class SliderEditPanel extends JPanel {
@@ -15,25 +18,38 @@ public class SliderEditPanel extends JPanel {
 		super();
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-		slider = new JSlider(min, max, initial);
-		field = new JFormattedTextField(new DecimalFormat("#"));
+		NumberFormatter formatter = new NumberFormatter();
+		formatter.setMaximum(max);
+		formatter.setMinimum(min);
 
-		slider.addChangeListener(e -> field.setText(slider.getValue() + ""));
+		slider = new JSlider(min, max, initial);
+		field = new JFormattedTextField(formatter);
+
+		field.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+				if (!Character.isDigit(e.getKeyChar())){
+					e.consume();
+				}
+			}
+		});
+		slider.addChangeListener(e -> field.setValue(slider.getValue()));
 
 		field.setSize(new Dimension(75, 30));
 		field.setHorizontalAlignment(SwingConstants.CENTER);
-		field.setText(initial+"");
+		field.setValue(initial);
 		field.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusLost(FocusEvent e) {
-				slider.setValue(Integer.parseInt(field.getText()));
+				int value = Integer.parseInt(field.getText());
+				slider.setValue(value);
 			}
 		});
 		add(slider);
 		add(field);
 	}
 
-	public int getValue(){
+	public int getValue() {
 		return slider.getValue();
 	}
 }

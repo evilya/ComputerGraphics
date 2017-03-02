@@ -47,7 +47,35 @@ public class MainFrame extends JFrame {
 		if (icon != null) {
 			try {
 				Image image = ImageIO.read(getClass().getResource("/" + icon));
-				image = image.getScaledInstance(30, 30, 0);
+				image = image.getScaledInstance(16, 16, 0);
+				ImageIcon imageIcon = new ImageIcon(image, title);
+				item.setIcon(imageIcon);
+			} catch (IOException ignore) {
+			}
+		}
+		final Method method = getClass().getMethod(actionMethod);
+		item.addActionListener(evt -> {
+			try {
+				method.invoke(MainFrame.this);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		});
+		return item;
+	}
+
+	public JRadioButtonMenuItem createRadioMenuItem(String title,
+	                                String tooltip,
+	                                int mnemonic,
+	                                String icon,
+	                                String actionMethod) throws SecurityException, NoSuchMethodException {
+		JRadioButtonMenuItem item = new JRadioButtonMenuItem(title);
+		item.setMnemonic(mnemonic);
+		item.setToolTipText(tooltip);
+		if (icon != null) {
+			try {
+				Image image = ImageIO.read(getClass().getResource("/" + icon));
+				image = image.getScaledInstance(16, 16, 0);
 				ImageIcon imageIcon = new ImageIcon(image, title);
 				item.setIcon(imageIcon);
 			} catch (IOException ignore) {
@@ -91,20 +119,37 @@ public class MainFrame extends JFrame {
 	}
 
 
-	public void addMenuItem(String title, String tooltip, int mnemonic, String icon, String actionMethod) throws SecurityException, NoSuchMethodException {
+	public JMenuItem addMenuItem(String title,
+	                             String tooltip,
+	                             int mnemonic,
+	                             String icon,
+	                             String actionMethod) throws SecurityException, NoSuchMethodException {
 		MenuElement element = getParentMenuElement(title);
 		if (element == null) {
 			throw new InvalidParameterException("Menu path not found: " + title);
 		}
 		JMenuItem item = createMenuItem(getMenuPathName(title), tooltip, mnemonic, icon, actionMethod);
-		addItem(title, element, item);
+		return addItem(title, element, item);
 	}
 
-	private void addItem(String title, MenuElement element, JMenuItem item) {
+	public JMenuItem addRadioMenuItem(String title,
+	                                  String tooltip,
+	                                  int mnemonic,
+	                                  String icon,
+	                                  String actionMethod) throws SecurityException, NoSuchMethodException {
+		MenuElement element = getParentMenuElement(title);
+		if (element == null) {
+			throw new InvalidParameterException("Menu path not found: " + title);
+		}
+		JRadioButtonMenuItem item = createRadioMenuItem(getMenuPathName(title), tooltip, mnemonic, icon, actionMethod);
+		return addItem(title, element, item);
+	}
+
+	private JMenuItem addItem(String title, MenuElement element, JMenuItem item) {
 		if (element instanceof JMenu) {
-			((JMenu) element).add(item);
+			return ((JMenu) element).add(item);
 		} else if (element instanceof JPopupMenu) {
-			((JPopupMenu) element).add(item);
+			return ((JPopupMenu) element).add(item);
 		} else {
 			throw new InvalidParameterException("Invalid menu path: " + title);
 		}
@@ -185,6 +230,15 @@ public class MainFrame extends JFrame {
 		return button;
 	}
 
+	public JToggleButton createToolBarToggleButton(JMenuItem item) {
+		JToggleButton button = new JToggleButton(item.getIcon());
+		for (ActionListener listener : item.getActionListeners()) {
+			button.addActionListener(listener);
+		}
+		button.setToolTipText(item.getToolTipText());
+		return button;
+	}
+
 	public JButton createToolBarButton(String menuPath) {
 		JMenuItem item = (JMenuItem) getMenuElement(menuPath);
 		if (item == null) {
@@ -193,8 +247,24 @@ public class MainFrame extends JFrame {
 		return createToolBarButton(item);
 	}
 
-	public void addToolBarButton(String menuPath) {
-		toolBar.add(createToolBarButton(menuPath));
+	public JToggleButton createToolBarToggleButton(String menuPath){
+		JMenuItem item = (JMenuItem) getMenuElement(menuPath);
+		if (item == null) {
+			throw new InvalidParameterException("Menu path not found: " + menuPath);
+		}
+		return createToolBarToggleButton(item);
+	}
+
+	public JButton addToolBarButton(String menuPath) {
+		JButton button = createToolBarButton(menuPath);
+		toolBar.add(button);
+		return button;
+	}
+
+	public JToggleButton addToolBarToggleButton(String menuPath){
+		JToggleButton button = createToolBarToggleButton(menuPath);
+		toolBar.add(button);
+		return button;
 	}
 
 	public void addToolBarSeparator() {

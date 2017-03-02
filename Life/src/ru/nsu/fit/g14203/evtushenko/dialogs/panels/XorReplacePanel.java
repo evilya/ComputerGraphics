@@ -17,14 +17,14 @@ public class XorReplacePanel extends JPanel {
 		group.add(replaceButton);
 		add(xorButton);
 		add(replaceButton);
-		if (xorSelected){
+		if (xorSelected) {
 			xorButton.setSelected(true);
 		} else {
 			replaceButton.setSelected(true);
 		}
 	}
 
-	public boolean isXor(){
+	public boolean isXor() {
 		return xorButton.isSelected();
 	}
 }

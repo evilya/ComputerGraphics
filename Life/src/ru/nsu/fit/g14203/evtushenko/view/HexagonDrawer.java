@@ -41,7 +41,8 @@ public class HexagonDrawer {
 
 	public void draw(int centerX, int centerY) {
 		if (lineThickness > 1) {
-			graphics.setStroke(new BasicStroke(lineThickness));
+			graphics.setStroke(new BasicStroke(lineThickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+//			graphics.setStroke(new BasicStroke(lineThickness));
 			graphics.setColor(Color.BLACK);
 		}
 		drawLine(centerX, centerY - size, centerX + offsetX, centerY - offsetY);

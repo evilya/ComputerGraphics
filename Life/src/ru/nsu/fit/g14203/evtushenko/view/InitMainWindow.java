@@ -1,15 +1,16 @@
 package ru.nsu.fit.g14203.evtushenko.view;
 
 import ru.nsu.fit.g14203.evtushenko.dialogs.CreationDialog;
+import ru.nsu.fit.g14203.evtushenko.dialogs.SaveOfferDialog;
 import ru.nsu.fit.g14203.evtushenko.dialogs.SettingsDialog;
 import ru.nsu.fit.g14203.evtushenko.model.Cell;
 import ru.nsu.fit.g14203.evtushenko.model.Model;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.Writer;
 
 public class InitMainWindow extends MainFrame {
@@ -18,41 +19,81 @@ public class InitMainWindow extends MainFrame {
 	private Model model;
 	private HexView view;
 	private Timer timer;
+	private String curFile;
 
 	public InitMainWindow() {
 		super(600, 400, "LIFE");
-		setMinimumSize(getSize());
 		try {
 			addSubMenu("File", KeyEvent.VK_F);
-			addMenuItem("File/New", "Create new game", KeyEvent.VK_N, "new.png", "onNew");
-			addMenuItem("File/Open", "Open game", KeyEvent.VK_O, "open.png", "onOpen");
-			addMenuItem("File/Save", "Save game", KeyEvent.VK_S, "save.png", "onSave");
+			addMenuItem("File/New", "Create new", KeyEvent.VK_N, "new.png", "onNew");
+			addMenuItem("File/Open", "Open", KeyEvent.VK_O, "open.png", "onOpen");
+			addMenuItem("File/Save", "Save", KeyEvent.VK_S, "save.png", "onSave");
+			addMenuItem("File/Save as", "Save as", KeyEvent.VK_A, "saveas.png", "onSaveAs");
 			addMenuSeparator("File");
-			addMenuItem("File/Exit", "Exit application", KeyEvent.VK_X, "exit.png", "onExit");
+			addMenuItem("File/Exit", "Exit", KeyEvent.VK_X, "exit.png", "onExit");
 
 			addSubMenu("Game", KeyEvent.VK_G);
 			addMenuItem("Game/Next", "Next state", KeyEvent.VK_E, "next.png", "onNext");
 			addMenuItem("Game/Run", "Run game", KeyEvent.VK_R, "run.png", "onRun");
 			addMenuItem("Game/Clear", "Clear field", KeyEvent.VK_C, "clear.png", "onClear");
 			addMenuSeparator("Game");
-			addMenuItem("Game/Show impacts", "Shows each cell's impact", KeyEvent.VK_I, "impacts.png", "onImpactShow");
-			addMenuItem("Game/Settings", "Open game settings", KeyEvent.VK_S, "options.png", "onSettings");
+			JRadioButtonMenuItem menuImpacts =
+					(JRadioButtonMenuItem) addRadioMenuItem("Game/Show impacts",
+							"Shows each cell's impact",
+							KeyEvent.VK_I,
+							"impacts.png",
+							"onImpactShow");
+			JRadioButtonMenuItem replaceMode =
+					(JRadioButtonMenuItem) addRadioMenuItem("Game/Replace",
+							"Replace fill",
+							KeyEvent.VK_R,
+							"replace.png",
+							"onReplace");
+			JRadioButtonMenuItem xorMode =
+					(JRadioButtonMenuItem) addRadioMenuItem("Game/XOR",
+							"Xor fill",
+							KeyEvent.VK_X,
+							"xor.png",
+							"onXor");
+			addMenuItem("Game/Settings", "Open game settings", KeyEvent.VK_S, "settings.png", "onSettings");
 			addSubMenu("Help", KeyEvent.VK_H);
 			addMenuItem("Help/About", "Show program version and copyright information", KeyEvent.VK_A, "about.png", "onAbout");
 
 			addToolBarButton("File/New");
 			addToolBarButton("File/Open");
 			addToolBarButton("File/Save");
+			addToolBarButton("File/Save as");
 			addToolBarSeparator();
 			addToolBarButton("Game/Next");
 			addToolBarButton("Game/Run");
-			addToolBarButton("Game/Show impacts");
+			JToggleButton toolbarImpacts = addToolBarToggleButton("Game/Show impacts");
 			addToolBarButton("Game/Clear");
+			JToggleButton toolbarReplace = addToolBarToggleButton("Game/Replace");
+			JToggleButton toolbarXor = addToolBarToggleButton("Game/XOR");
 			addToolBarSeparator();
 			addToolBarButton("Game/Settings");
 			addToolBarSeparator();
 			addToolBarButton("File/Exit");
 			addToolBarButton("Help/About");
+
+			menuImpacts.addActionListener(e -> toolbarImpacts.setSelected(menuImpacts.isSelected()));
+			toolbarImpacts.addActionListener(e -> menuImpacts.setSelected(toolbarImpacts.isSelected()));
+
+			ButtonGroup menuGroup = new ButtonGroup();
+			menuGroup.add(xorMode);
+			menuGroup.add(replaceMode);
+			replaceMode.setSelected(true);
+
+			ButtonGroup toolbarGroup = new ButtonGroup();
+			toolbarGroup.add(toolbarXor);
+			toolbarGroup.add(toolbarReplace);
+			toolbarReplace.setSelected(true);
+
+			replaceMode.addActionListener(e -> toolbarReplace.setSelected(replaceMode.isSelected()));
+			toolbarReplace.addActionListener(e -> replaceMode.setSelected(toolbarReplace.isSelected()));
+
+			xorMode.addActionListener(e -> toolbarXor.setSelected(xorMode.isSelected()));
+			toolbarXor.addActionListener(e -> xorMode.setSelected(toolbarXor.isSelected()));
 
 			timer = new Timer(1000, e -> onNext());
 
@@ -75,7 +116,7 @@ public class InitMainWindow extends MainFrame {
 	}
 
 	public void onImpactShow() {
-		if (view.isShowImpact()){
+		if (view.isShowImpact()) {
 			view.setShowImpact(false);
 		} else {
 			view.setShowImpact(true);
@@ -85,6 +126,7 @@ public class InitMainWindow extends MainFrame {
 	public void onSettings() {
 		new SettingsDialog(this, model);
 		scrollPane.revalidate();
+		scrollPane.repaint();
 	}
 
 	public void onClear() {
@@ -110,21 +152,34 @@ public class InitMainWindow extends MainFrame {
 	}
 
 	public void onExit() {
-		//TODO: Save
+		SaveOfferDialog saveOfferDialog = new SaveOfferDialog(this);
+		if (saveOfferDialog.getResult()) {
+			onSave();
+		}
 		System.exit(0);
 	}
 
 	public void onNew() {
+		SaveOfferDialog saveOfferDialog = new SaveOfferDialog(this);
+		if (saveOfferDialog.getResult()) {
+			onSave();
+		}
+		curFile = null;
 		new CreationDialog(this);
 		scrollPane.revalidate();
 	}
 
 	public void onOpen() {
+		SaveOfferDialog saveOfferDialog = new SaveOfferDialog(this);
+		if (saveOfferDialog.getResult()) {
+			onSave();
+		}
 		JFileChooser fileChooser = new JFileChooser("FIT_14203_Evtushenko_Ilya_Life_Data");
 		int res = fileChooser.showDialog(this, "Open");
 		if (res == JFileChooser.APPROVE_OPTION) {
 			try {
-				model.loadFromFile(fileChooser.getSelectedFile().getPath());
+				curFile = fileChooser.getSelectedFile().getPath();
+				model.loadFromFile(curFile);
 			} catch (Exception e) {
 				JOptionPane.showMessageDialog(this, "Can not open file");
 			}
@@ -133,37 +188,60 @@ public class InitMainWindow extends MainFrame {
 	}
 
 	public void onSave() {
-		JFileChooser fileChooser = new JFileChooser("FIT_14203_Evtushenko_Ilya_Life_Data");
-		int res = fileChooser.showDialog(this, "Save");
-		if (res == JFileChooser.APPROVE_OPTION) {
-			try {
-				File file = fileChooser.getSelectedFile();
-				Writer writer = new FileWriter(file);
-				int width = model.getWidth();
-				int height = model.getHeight();
-				writer.write(width + " " + height + "\n");
-				writer.write(model.getLineThickness() + "\n");
-				writer.write(model.getCellSize() + "\n");
-				Cell[][] cells = model.getCells();
-				int aliveCount = 0;
-				for (int y = 0; y < height; y++) {
-					for (int x = 0; x < width - y % 2; x++) {
-						if (cells[y][x].isAlive()) {
-							aliveCount++;
-						}
+		try {
+			if (curFile == null) {
+				onSaveAs();
+			} else {
+				writeModelToFile(new File(curFile));
+			}
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(this, "Can not save to file");
+		}
+	}
+
+	public void onSaveAs() {
+		try {
+			JFileChooser fileChooser = new JFileChooser("FIT_14203_Evtushenko_Ilya_Life_Data");
+			int res = fileChooser.showDialog(this, "Save");
+			if (res == JFileChooser.APPROVE_OPTION) {
+				writeModelToFile(fileChooser.getSelectedFile());
+			}
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(this, "Can not save to file");
+		}
+	}
+
+	public void onReplace() {
+		model.setXorFill(false);
+	}
+
+	public void onXor() {
+		model.setXorFill(true);
+	}
+
+	private void writeModelToFile(File file) throws IOException {
+		try (Writer writer = new FileWriter(file)) {
+			int width = model.getWidth();
+			int height = model.getHeight();
+			writer.write(width + " " + height + "\n");
+			writer.write(model.getLineThickness() + "\n");
+			writer.write(model.getCellSize() + "\n");
+			Cell[][] cells = model.getCells();
+			int aliveCount = 0;
+			for (int y = 0; y < height; y++) {
+				for (int x = 0; x < width - y % 2; x++) {
+					if (cells[y][x].isAlive()) {
+						aliveCount++;
 					}
 				}
-				writer.write(aliveCount + "\n");
-				for (int y = 0; y < height; y++) {
-					for (int x = 0; x < width - y % 2; x++) {
-						if (model.getCellState(x,y)) {
-							writer.write(x + " " + y + "\n");
-						}
+			}
+			writer.write(aliveCount + "\n");
+			for (int y = 0; y < height; y++) {
+				for (int x = 0; x < width - y % 2; x++) {
+					if (model.getCellState(x, y)) {
+						writer.write(x + " " + y + "\n");
 					}
 				}
-				writer.close();
-			} catch (Exception e) {
-				JOptionPane.showMessageDialog(this, "Can not save to file");
 			}
 		}
 	}

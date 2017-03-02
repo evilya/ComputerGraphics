@@ -1,7 +1,10 @@
 package ru.nsu.fit.g14203.evtushenko.dialogs.panels;
 
 import javax.swing.*;
+import javax.swing.text.NumberFormatter;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 
@@ -13,14 +16,23 @@ public class LifeParametersPanel extends JPanel {
 	private final JFormattedTextField firstImpactField;
 	private final JFormattedTextField secondImpactField;
 
-	public LifeParametersPanel(float lifeBegin,
-	                           float lifeEnd,
-	                           float birthBegin,
-	                           float birthEnd,
-	                           float firstImpact,
-	                           float secondImpact) {
+	public LifeParametersPanel(double lifeBegin,
+	                           double lifeEnd,
+	                           double birthBegin,
+	                           double birthEnd,
+	                           double firstImpact,
+	                           double secondImpact) {
 		super();
 		setLayout(new GridLayout(2, 6, 5, 5));
+
+		 KeyAdapter numbersAdapter = new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+				if (!(Character.isDigit(e.getKeyChar()) || e.getKeyChar() == '.')){
+					e.consume();
+				}
+			}
+		};
 
 		JLabel lifeBeginLabel = new JLabel("Life Begin", JLabel.RIGHT);
 		JLabel lifeEndLabel = new JLabel("Life End", JLabel.RIGHT);
@@ -32,37 +44,46 @@ public class LifeParametersPanel extends JPanel {
 
 		DecimalFormatSymbols symbols = new DecimalFormatSymbols();
 		symbols.setDecimalSeparator('.');
-		symbols.setMinusSign(' ');
-		DecimalFormat format = new DecimalFormat("#0.0#", symbols);
+		DecimalFormat format = new DecimalFormat("#0.0", symbols);
+		NumberFormatter formatter = new NumberFormatter(format);
+		formatter.setMaximum(10.f);
+		formatter.setMinimum(0.f);
 
-		lifeBeginField = new JFormattedTextField(format);
-		lifeEndField = new JFormattedTextField(format);
-		birthBeginField = new JFormattedTextField(format);
-		birthEndField = new JFormattedTextField(format);
-		firstImpactField = new JFormattedTextField(format);
-		secondImpactField = new JFormattedTextField(format);
+		lifeBeginField = new JFormattedTextField(formatter);
+		lifeEndField = new JFormattedTextField(formatter);
+		birthBeginField = new JFormattedTextField(formatter);
+		birthEndField = new JFormattedTextField(formatter);
+		firstImpactField = new JFormattedTextField(formatter);
+		secondImpactField = new JFormattedTextField(formatter);
 
-		lifeBeginField.setText(lifeBegin + "");
-		lifeEndField.setText(lifeEnd + "");
-		birthBeginField.setText(birthBegin + "");
-		birthEndField.setText(birthEnd + "");
-		firstImpactField.setText(firstImpact + "");
-		secondImpactField.setText(secondImpact + "");
+		lifeBeginField.addKeyListener(numbersAdapter);
+		lifeEndField.addKeyListener(numbersAdapter);
+		birthBeginField.addKeyListener(numbersAdapter);
+		birthEndField.addKeyListener(numbersAdapter);
+		firstImpactField.addKeyListener(numbersAdapter);
+		secondImpactField.addKeyListener(numbersAdapter);
+
+		lifeBeginField.setValue(lifeBegin);
+		lifeEndField.setValue(lifeEnd);
+		birthBeginField.setValue(birthBegin);
+		birthEndField.setValue(birthEnd);
+		firstImpactField.setValue(firstImpact);
+		secondImpactField.setValue(secondImpact);
 
 		add(lifeBeginLabel);
 		add(lifeBeginField);
 
-		add(lifeEndLabel);
-		add(lifeEndField);
-
 		add(birthBeginLabel);
 		add(birthBeginField);
 
-		add(birthEndLabel);
-		add(birthEndField);
-
 		add(firstImpactLabel);
 		add(firstImpactField);
+
+		add(lifeEndLabel);
+		add(lifeEndField);
+
+		add(birthEndLabel);
+		add(birthEndField);
 
 		add(secondImpactLabel);
 		add(secondImpactField);
