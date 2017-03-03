@@ -7,7 +7,6 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.text.DecimalFormat;
 
 public class SliderEditPanel extends JPanel {
 
@@ -28,7 +27,7 @@ public class SliderEditPanel extends JPanel {
 		field.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyTyped(KeyEvent e) {
-				if (!Character.isDigit(e.getKeyChar())){
+				if (!Character.isDigit(e.getKeyChar())) {
 					e.consume();
 				}
 			}

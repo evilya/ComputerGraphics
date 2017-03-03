@@ -65,10 +65,10 @@ public class MainFrame extends JFrame {
 	}
 
 	public JRadioButtonMenuItem createRadioMenuItem(String title,
-	                                String tooltip,
-	                                int mnemonic,
-	                                String icon,
-	                                String actionMethod) throws SecurityException, NoSuchMethodException {
+	                                                String tooltip,
+	                                                int mnemonic,
+	                                                String icon,
+	                                                String actionMethod) throws SecurityException, NoSuchMethodException {
 		JRadioButtonMenuItem item = new JRadioButtonMenuItem(title);
 		item.setMnemonic(mnemonic);
 		item.setToolTipText(tooltip);
@@ -247,7 +247,7 @@ public class MainFrame extends JFrame {
 		return createToolBarButton(item);
 	}
 
-	public JToggleButton createToolBarToggleButton(String menuPath){
+	public JToggleButton createToolBarToggleButton(String menuPath) {
 		JMenuItem item = (JMenuItem) getMenuElement(menuPath);
 		if (item == null) {
 			throw new InvalidParameterException("Menu path not found: " + menuPath);
@@ -261,7 +261,7 @@ public class MainFrame extends JFrame {
 		return button;
 	}
 
-	public JToggleButton addToolBarToggleButton(String menuPath){
+	public JToggleButton addToolBarToggleButton(String menuPath) {
 		JToggleButton button = createToolBarToggleButton(menuPath);
 		toolBar.add(button);
 		return button;

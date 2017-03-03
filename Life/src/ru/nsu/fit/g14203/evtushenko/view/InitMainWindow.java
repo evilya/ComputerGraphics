@@ -34,7 +34,12 @@ public class InitMainWindow extends MainFrame {
 
 			addSubMenu("Game", KeyEvent.VK_G);
 			addMenuItem("Game/Next", "Next state", KeyEvent.VK_E, "next.png", "onNext");
-			addMenuItem("Game/Run", "Run game", KeyEvent.VK_R, "run.png", "onRun");
+			JRadioButtonMenuItem menuRun =
+					(JRadioButtonMenuItem) addRadioMenuItem("Game/Run",
+							"Run game",
+							KeyEvent.VK_R,
+							"run.png",
+							"onRun");
 			addMenuItem("Game/Clear", "Clear field", KeyEvent.VK_C, "clear.png", "onClear");
 			addMenuSeparator("Game");
 			JRadioButtonMenuItem menuImpacts =
@@ -43,13 +48,13 @@ public class InitMainWindow extends MainFrame {
 							KeyEvent.VK_I,
 							"impacts.png",
 							"onImpactShow");
-			JRadioButtonMenuItem replaceMode =
+			JRadioButtonMenuItem menuReplace =
 					(JRadioButtonMenuItem) addRadioMenuItem("Game/Replace",
 							"Replace fill",
 							KeyEvent.VK_R,
 							"replace.png",
 							"onReplace");
-			JRadioButtonMenuItem xorMode =
+			JRadioButtonMenuItem menuXor =
 					(JRadioButtonMenuItem) addRadioMenuItem("Game/XOR",
 							"Xor fill",
 							KeyEvent.VK_X,
@@ -65,7 +70,7 @@ public class InitMainWindow extends MainFrame {
 			addToolBarButton("File/Save as");
 			addToolBarSeparator();
 			addToolBarButton("Game/Next");
-			addToolBarButton("Game/Run");
+			JToggleButton toolbarRun = addToolBarToggleButton("Game/Run");
 			JToggleButton toolbarImpacts = addToolBarToggleButton("Game/Show impacts");
 			addToolBarButton("Game/Clear");
 			JToggleButton toolbarReplace = addToolBarToggleButton("Game/Replace");
@@ -76,24 +81,27 @@ public class InitMainWindow extends MainFrame {
 			addToolBarButton("File/Exit");
 			addToolBarButton("Help/About");
 
+			toolbarRun.addActionListener(e -> menuRun.setSelected(toolbarRun.isSelected()));
+			menuRun.addActionListener(e -> toolbarRun.setSelected(menuRun.isSelected()));
+
 			menuImpacts.addActionListener(e -> toolbarImpacts.setSelected(menuImpacts.isSelected()));
 			toolbarImpacts.addActionListener(e -> menuImpacts.setSelected(toolbarImpacts.isSelected()));
 
 			ButtonGroup menuGroup = new ButtonGroup();
-			menuGroup.add(xorMode);
-			menuGroup.add(replaceMode);
-			replaceMode.setSelected(true);
+			menuGroup.add(menuXor);
+			menuGroup.add(menuReplace);
+			menuReplace.setSelected(true);
 
 			ButtonGroup toolbarGroup = new ButtonGroup();
 			toolbarGroup.add(toolbarXor);
 			toolbarGroup.add(toolbarReplace);
 			toolbarReplace.setSelected(true);
 
-			replaceMode.addActionListener(e -> toolbarReplace.setSelected(replaceMode.isSelected()));
-			toolbarReplace.addActionListener(e -> replaceMode.setSelected(toolbarReplace.isSelected()));
+			menuReplace.addActionListener(e -> toolbarReplace.setSelected(menuReplace.isSelected()));
+			toolbarReplace.addActionListener(e -> menuReplace.setSelected(toolbarReplace.isSelected()));
 
-			xorMode.addActionListener(e -> toolbarXor.setSelected(xorMode.isSelected()));
-			toolbarXor.addActionListener(e -> xorMode.setSelected(toolbarXor.isSelected()));
+			menuXor.addActionListener(e -> toolbarXor.setSelected(menuXor.isSelected()));
+			toolbarXor.addActionListener(e -> menuXor.setSelected(toolbarXor.isSelected()));
 
 			timer = new Timer(1000, e -> onNext());
 

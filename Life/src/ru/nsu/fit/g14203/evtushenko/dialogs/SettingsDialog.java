@@ -87,6 +87,10 @@ public class SettingsDialog extends JDialog {
 		c.gridx = 1;
 		add(cancelButton, c);
 
+		cancelButton.addActionListener(e -> {
+			dispose();
+		});
+
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		pack();
 		setVisible(true);
@@ -94,7 +98,7 @@ public class SettingsDialog extends JDialog {
 
 	private class OnOkListener implements ActionListener {
 
-		private boolean checkParameters(){
+		private boolean checkParameters() {
 			int width = widthHeightPanel.getWidth();
 			int height = widthHeightPanel.getHeight();
 			double lifeBegin = lifeParametersPanel.getLifeBeginField();

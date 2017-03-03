@@ -4,9 +4,11 @@ import ru.nsu.fit.g14203.evtushenko.EventType;
 import ru.nsu.fit.g14203.evtushenko.Observable;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.stream.Stream;
 
 public class Model extends Observable {
 	private double firstImpact = 1.;
@@ -48,45 +50,91 @@ public class Model extends Observable {
 	}
 
 	public void loadFromFile(String file) throws IOException {
-		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-			String line = reader.readLine();
-			Scanner scanner = new Scanner(line);
-			width = scanner.nextInt();
-			height = scanner.nextInt();
-
+		try (Scanner scanner = new Scanner(new File(file))) {
+			int[] values = getNextInts(scanner);
+			width = values[0];
+			height = values[1];
 			if (width <= 0 || height <= 0) {
 				throw new IOException("Incorrect field size");
 			}
-
 			createEmptyField(width, height);
 
-			line = reader.readLine();
-			scanner = new Scanner(line);
-			lineThickness = scanner.nextInt();
+			values = getNextInts(scanner);
+			lineThickness = values[0];
 
-			line = reader.readLine();
-			scanner = new Scanner(line);
-			cellSize = scanner.nextInt();
+			values = getNextInts(scanner);
+			cellSize = values[0];
 
-			line = reader.readLine();
-			scanner = new Scanner(line);
-			int aliveCount = scanner.nextInt();
+			values = getNextInts(scanner);
+			int aliveCount = values[0];
 			if (aliveCount < 0) {
 				throw new IOException("Incorrect number of alive cells");
 			}
 			for (int i = 0; i < aliveCount; i++) {
-				line = reader.readLine();
-				scanner = new Scanner(line);
-				int x = scanner.nextInt();
-				int y = scanner.nextInt();
+				values = getNextInts(scanner);
+				int x = values[0];
+				int y = values[1];
 				if (x < 0 || x + y % 2 >= width || y < 0 || y >= height) {
 					throw new IOException("Incorrect alive cell position");
 				}
 				cells[y][x].setAlive(true);
 			}
 			notifyObservers(EventType.RESIZE);
+
 		}
 
+//		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+//			String line = reader.readLine();
+//			Scanner scanner = new Scanner(line);
+//			width = scanner.nextInt();
+//			height = scanner.nextInt();
+//
+//			if (width <= 0 || height <= 0) {
+//				throw new IOException("Incorrect field size");
+//			}
+//
+//			createEmptyField(width, height);
+//
+//			line = reader.readLine();
+//			scanner = new Scanner(line);
+//			lineThickness = scanner.nextInt();
+//
+//			line = reader.readLine();
+//			scanner = new Scanner(line);
+//			cellSize = scanner.nextInt();
+//
+//			line = reader.readLine();
+//			scanner = new Scanner(line);
+//			int aliveCount = scanner.nextInt();
+//			if (aliveCount < 0) {
+//				throw new IOException("Incorrect number of alive cells");
+//			}
+//			for (int i = 0; i < aliveCount; i++) {
+//				line = reader.readLine();
+//				scanner = new Scanner(line);
+//				int x = scanner.nextInt();
+//				int y = scanner.nextInt();
+//				if (x < 0 || x + y % 2 >= width || y < 0 || y >= height) {
+//					throw new IOException("Incorrect alive cell position");
+//				}
+//				cells[y][x].setAlive(true);
+//			}
+//			notifyObservers(EventType.RESIZE);
+//		}
+
+	}
+
+	private int[] getNextInts(Scanner scanner) {
+		String line;
+		do {
+			line = scanner.nextLine();
+			int commentStart = line.indexOf("//");
+			if (commentStart != -1) {
+				line = line.substring(0, commentStart).trim();
+			}
+		} while ("".equals(line));
+		String[] values = line.split(" ");
+		return Stream.of(values).mapToInt(Integer::parseInt).toArray();
 	}
 
 	public void createEmptyField(int width, int height) {

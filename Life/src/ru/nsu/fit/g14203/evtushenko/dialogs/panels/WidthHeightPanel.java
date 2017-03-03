@@ -3,11 +3,8 @@ package ru.nsu.fit.g14203.evtushenko.dialogs.panels;
 import javax.swing.*;
 import javax.swing.text.NumberFormatter;
 import java.awt.*;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.text.DecimalFormat;
 
 public class WidthHeightPanel extends JPanel {
 
@@ -24,7 +21,7 @@ public class WidthHeightPanel extends JPanel {
 		KeyAdapter keyAdapter = new KeyAdapter() {
 			@Override
 			public void keyTyped(KeyEvent e) {
-				if (!Character.isDigit(e.getKeyChar())){
+				if (!Character.isDigit(e.getKeyChar())) {
 					e.consume();
 				}
 			}

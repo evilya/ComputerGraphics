@@ -205,7 +205,6 @@ public class HexView extends JPanel implements Observer {
 	private void checkAndFill(MouseEvent e) {
 		int x = e.getX();
 		int y = e.getY();
-		System.out.println(x + " " + y);
 		if (x >= width || x < 0
 				|| y >= height || y < 0
 				|| img.getRGB(x, y) == borderColor.getRGB()) {

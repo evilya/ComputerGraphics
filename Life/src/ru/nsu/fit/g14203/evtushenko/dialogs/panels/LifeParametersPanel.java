@@ -25,10 +25,10 @@ public class LifeParametersPanel extends JPanel {
 		super();
 		setLayout(new GridLayout(2, 6, 5, 5));
 
-		 KeyAdapter numbersAdapter = new KeyAdapter() {
+		KeyAdapter numbersAdapter = new KeyAdapter() {
 			@Override
 			public void keyTyped(KeyEvent e) {
-				if (!(Character.isDigit(e.getKeyChar()) || e.getKeyChar() == '.')){
+				if (!(Character.isDigit(e.getKeyChar()) || e.getKeyChar() == '.')) {
 					e.consume();
 				}
 			}

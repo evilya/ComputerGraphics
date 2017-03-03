@@ -1,10 +1,7 @@
 package ru.nsu.fit.g14203.evtushenko.dialogs;
 
 import javax.swing.*;
-import javax.xml.transform.OutputKeys;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class SaveOfferDialog extends JDialog {
 
