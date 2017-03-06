@@ -3,9 +3,7 @@ package ru.nsu.fit.g14203.evtushenko.model;
 import ru.nsu.fit.g14203.evtushenko.EventType;
 import ru.nsu.fit.g14203.evtushenko.Observable;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
 import java.util.stream.Stream;

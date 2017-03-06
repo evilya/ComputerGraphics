@@ -46,10 +46,7 @@ public class MainFrame extends JFrame {
 		item.setToolTipText(tooltip);
 		if (icon != null) {
 			try {
-				Image image = ImageIO.read(getClass().getResource("/" + icon));
-				image = image.getScaledInstance(16, 16, 0);
-				ImageIcon imageIcon = new ImageIcon(image, title);
-				item.setIcon(imageIcon);
+				loadImage(icon, title, item);
 			} catch (IOException ignore) {
 			}
 		}
@@ -64,6 +61,13 @@ public class MainFrame extends JFrame {
 		return item;
 	}
 
+	private void loadImage(String icon, String title, JMenuItem item) throws IOException {
+		Image image = ImageIO.read(getClass().getResource("/resources/" + icon));
+		image = image.getScaledInstance(16, 16, 0);
+		ImageIcon imageIcon = new ImageIcon(image, title);
+		item.setIcon(imageIcon);
+	}
+
 	public JRadioButtonMenuItem createRadioMenuItem(String title,
 	                                                String tooltip,
 	                                                int mnemonic,
@@ -74,10 +78,7 @@ public class MainFrame extends JFrame {
 		item.setToolTipText(tooltip);
 		if (icon != null) {
 			try {
-				Image image = ImageIO.read(getClass().getResource("/" + icon));
-				image = image.getScaledInstance(16, 16, 0);
-				ImageIcon imageIcon = new ImageIcon(image, title);
-				item.setIcon(imageIcon);
+				loadImage(icon, title, item);
 			} catch (IOException ignore) {
 			}
 		}
