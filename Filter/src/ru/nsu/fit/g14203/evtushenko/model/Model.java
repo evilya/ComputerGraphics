@@ -13,9 +13,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 public class Model extends Observable implements Runnable {
-
-    private final Object monitorB = new Object();
-
     private BufferedImage imageA;
     private BufferedImage imageB;
     private BufferedImage imageC;
@@ -88,7 +85,7 @@ public class Model extends Observable implements Runnable {
                         filter = new FloydSteinbergFilter(parameters.getParameters());
                         break;
                     case ORDERED_DITHERING:
-                        filter = new OrderedDitheringFilter(parameters.getParameters());
+                        filter = new OrderedDitheringFilter();
                         break;
                     case ROBERTS:
                         filter = new RobertsFilter(parameters.getParameters());
@@ -102,6 +99,9 @@ public class Model extends Observable implements Runnable {
                     case GAMMA:
                         filter = new GammaFilter(parameters.getParameters());
                         break;
+                    case SOBEL:
+                        filter = new SobelFilter(parameters.getParameters());
+                        break;
                 }
                 imageC = filter.apply(imageB);
                 notifyObservers(EventType.C);
@@ -109,5 +109,24 @@ public class Model extends Observable implements Runnable {
         } catch (InterruptedException e) {
             return;
         }
+    }
+
+    public void moveLeft() {
+        int width = Math.min(350, imageC.getWidth());
+        int height = Math.min(350, imageC.getHeight());
+        imageB = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = imageB.createGraphics();
+        g.drawImage(imageC, 0,0, null);
+        g.dispose();
+        notifyObservers(EventType.B);
+    }
+
+    public void clear() {
+        imageA = null;
+        imageB = null;
+        imageC = null;
+        notifyObservers(EventType.A);
+        notifyObservers(EventType.B);
+        notifyObservers(EventType.C);
     }
 }

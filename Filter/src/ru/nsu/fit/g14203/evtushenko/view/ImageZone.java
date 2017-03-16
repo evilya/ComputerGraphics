@@ -24,10 +24,12 @@ public class ImageZone extends JPanel {
         super.paintComponent(g);
         g.drawImage(image, 0, 0, null);
         if (showChosen) {
-            drawNegativeLine(g, x - sizeW / 2, y - sizeH / 2, x - sizeW / 2, y + sizeH / 2 - 1);
-            drawNegativeLine(g, x - sizeW / 2, y - sizeH / 2, x + sizeW / 2 - 1, y - sizeH / 2);
-            drawNegativeLine(g, x + sizeW / 2 - 1, y + sizeH / 2 - 1, x - sizeW / 2, y + sizeH / 2 - 1);
-            drawNegativeLine(g, x + sizeW / 2 - 1, y + sizeH / 2 - 1, x + sizeW / 2 - 1, y - sizeH / 2);
+            g.setXORMode(Color.WHITE);
+            g.drawLine(x - sizeW / 2, y - sizeH / 2, x - sizeW / 2, y + sizeH / 2 - 1);
+            g.drawLine(x - sizeW / 2, y - sizeH / 2, x + sizeW / 2 - 1, y - sizeH / 2);
+            g.drawLine(x + sizeW / 2 - 1, y + sizeH / 2 - 1, x - sizeW / 2, y + sizeH / 2 - 1);
+            g.drawLine(x + sizeW / 2 - 1, y + sizeH / 2 - 1, x + sizeW / 2 - 1, y - sizeH / 2);
+            g.setPaintMode();
         }
     }
 

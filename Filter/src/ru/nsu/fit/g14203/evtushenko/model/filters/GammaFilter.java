@@ -18,10 +18,10 @@ public class GammaFilter implements Filter {
         BufferedImage result = new BufferedImage(width, height, source.getType());
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                Color color = new Color(source.getRGB(x,y));
-                int newRed = (int) (255 * Math.pow((double)color.getRed()/255, value));
-                int newGreen = (int) (255 * Math.pow((double)color.getGreen()/255, value));
-                int newBlue = (int) (255 * Math.pow((double)color.getBlue()/255, value));
+                Color color = new Color(source.getRGB(x, y));
+                int newRed = (int) (255 * Math.pow((double) color.getRed() / 255, value));
+                int newGreen = (int) (255 * Math.pow((double) color.getGreen() / 255, value));
+                int newBlue = (int) (255 * Math.pow((double) color.getBlue() / 255, value));
                 result.setRGB(x, y, new Color(newRed, newGreen, newBlue).getRGB());
             }
         }

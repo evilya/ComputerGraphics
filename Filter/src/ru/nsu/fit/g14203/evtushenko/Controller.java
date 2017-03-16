@@ -2,6 +2,7 @@ package ru.nsu.fit.g14203.evtushenko;
 
 import ru.nsu.fit.g14203.evtushenko.model.FilterParameters;
 import ru.nsu.fit.g14203.evtushenko.model.Model;
+import ru.nsu.fit.g14203.evtushenko.view.InitMainWindow;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -9,11 +10,11 @@ import java.io.IOException;
 public class Controller {
 
 
-    private boolean partChosen;
-
+    private final InitMainWindow mainWindow;
     private Model model;
 
-    public Controller(Model model) {
+    public Controller(Model model, InitMainWindow mainWindow) {
+        this.mainWindow = mainWindow;
         this.model = model;
     }
 
@@ -22,8 +23,13 @@ public class Controller {
     }
 
     public void chooseImagePart(int centerX, int centerY) {
-        partChosen = true;
+        mainWindow.setPartChosen(true);
         model.chooseImagePart(centerX, centerY);
+    }
+
+
+    public void moveLeft() {
+        model.moveLeft();
     }
 
     public void applyFilter(FilterParameters parameters) {
@@ -42,7 +48,10 @@ public class Controller {
         return model.getImageC();
     }
 
-    public boolean isPartChosen() {
-        return partChosen;
+    public void clear(){
+        mainWindow.setChoseEnabled(false);
+        mainWindow.setPartChosen(false);
+        model.clear();
     }
+
 }

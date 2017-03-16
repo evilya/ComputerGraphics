@@ -3,19 +3,35 @@ package ru.nsu.fit.g14203.evtushenko.view;
 import ru.nsu.fit.g14203.evtushenko.Controller;
 import ru.nsu.fit.g14203.evtushenko.model.FilterParameters;
 import ru.nsu.fit.g14203.evtushenko.model.Model;
+import ru.nsu.fit.g14203.evtushenko.utils.ExtensionFileFilter;
+import ru.nsu.fit.g14203.evtushenko.view.dialogs.ColorDialog;
+import ru.nsu.fit.g14203.evtushenko.view.dialogs.SingleFloatParameterDialog;
+import ru.nsu.fit.g14203.evtushenko.view.dialogs.SingleIntParameterDialog;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.HashSet;
+import java.util.Set;
 
 import static ru.nsu.fit.g14203.evtushenko.model.FilterParameters.FilterType;
 
 public class InitMainWindow extends MainFrame {
 
-    private Controller controller;
-    private View view;
+    private Set<JButton> toolbarButtons = new HashSet<>();
+    private Set<JMenuItem> menuItems = new HashSet<>();
+
     private JToggleButton chooseToggle;
     private JRadioButtonMenuItem chooseItem;
+
+    private Controller controller;
+    private View view;
+    private String file;
 
     public InitMainWindow() {
         super(1120, 460, "Filter");
@@ -23,10 +39,13 @@ public class InitMainWindow extends MainFrame {
             initMenu();
             initToolbar();
 
+            toolbarButtons.forEach(e -> e.setEnabled(false));
+            menuItems.forEach(e -> e.setEnabled(false));
+
             Model model = new Model();
             Thread modelThread = new Thread(model);
             modelThread.start();
-            controller = new Controller(model);
+            controller = new Controller(model, this);
             view = new View(controller);
             model.addObserver(view);
 
@@ -46,55 +65,61 @@ public class InitMainWindow extends MainFrame {
 
     private void initToolbar() throws NoSuchMethodException {
         addToolBarButton("File/Open");
-        addToolBarButton("File/Save");
-        addToolBarButton("File/Save as");
+        toolbarButtons.add(addToolBarButton("File/Save"));
+        toolbarButtons.add(addToolBarButton("File/Save as"));
+        toolbarButtons.add(addToolBarButton("File/Clear"));
         addToolBarSeparator();
 
         chooseToggle = addToolBarToggleButton("Filters/Chose");
         chooseToggle.setEnabled(false);
-
-        addToolBarButton("Filters/Blur");
-        addToolBarButton("Filters/Negative");
-        addToolBarButton("Filters/BW");
-        addToolBarButton("Filters/Sharpness");
-        addToolBarButton("Filters/Stamp");
-        addToolBarButton("Filters/Floyd-Steinberg");
-        addToolBarButton("Filters/Ordered dithering");
-        addToolBarButton("Filters/Aquarelle");
-        addToolBarButton("Filters/Roberts");
-        addToolBarButton("Filters/Rotation");
-        addToolBarButton("Filters/Zoom");
-        addToolBarButton("Filters/Gamma");
-
-
+        toolbarButtons.add(addToolBarButton("Filters/BW"));
+        toolbarButtons.add(addToolBarButton("Filters/Blur"));
+        toolbarButtons.add(addToolBarButton("Filters/Negative"));
+        toolbarButtons.add(addToolBarButton("Filters/Sharpness"));
+        toolbarButtons.add(addToolBarButton("Filters/Stamp"));
+        toolbarButtons.add(addToolBarButton("Filters/Aquarelle"));
+        toolbarButtons.add(addToolBarButton("Filters/Gamma"));
         addToolBarSeparator();
-        addToolBarButton("Help/About");
-        addToolBarButton("File/Exit");
+        toolbarButtons.add(addToolBarButton("Filters/Floyd-Steinberg"));
+        toolbarButtons.add(addToolBarButton("Filters/Ordered dithering"));
+        addToolBarSeparator();
+        toolbarButtons.add(addToolBarButton("Filters/Roberts"));
+        toolbarButtons.add(addToolBarButton("Filters/Sobel"));
+        addToolBarSeparator();
+        toolbarButtons.add(addToolBarButton("Filters/Rotation"));
+        toolbarButtons.add(addToolBarButton("Filters/Zoom"));
+        toolbarButtons.add(addToolBarButton("Filters/Copy C to B"));
+        addToolBarSeparator();
+        toolbarButtons.add(addToolBarButton("Help/About"));
+        toolbarButtons.add(addToolBarButton("File/Exit"));
     }
 
     private void initMenu() throws NoSuchMethodException {
         addSubMenu("File", KeyEvent.VK_F);
         addMenuItem("File/Open", "Open", KeyEvent.VK_O, "open.png", "onOpen");
-        addMenuItem("File/Save", "Save", KeyEvent.VK_S, "save.png", "onSave");
-        addMenuItem("File/Save as", "Save as", KeyEvent.VK_A, "saveas.png", "onSaveAs");
+        menuItems.add(addMenuItem("File/Save", "Save", KeyEvent.VK_S, "save.png", "onSave"));
+        menuItems.add(addMenuItem("File/Save as", "Save as", KeyEvent.VK_A, "saveas.png", "onSaveAs"));
+        menuItems.add(addMenuItem("File/Clear", "Clear", KeyEvent.VK_A, "saveas.png", "onClear"));
         addMenuSeparator("File");
         addMenuItem("File/Exit", "Exit", KeyEvent.VK_X, "exit.png", "onExit");
 
         addSubMenu("Filters", KeyEvent.VK_I);
-        chooseItem = (JRadioButtonMenuItem) addRadioMenuItem("Filters/Chose", "Chose", KeyEvent.VK_O, "run.png", "onChose");
+        chooseItem = (JRadioButtonMenuItem) addRadioMenuItem("Filters/Chose", "Chose", KeyEvent.VK_O, "select.png", "onChose");
         chooseItem.setEnabled(false);
-        addMenuItem("Filters/Blur", "Blur", KeyEvent.VK_O, "run.png", "onBlur");
-        addMenuItem("Filters/Negative", "Negative", KeyEvent.VK_S, "run.png", "onNegative");
-        addMenuItem("Filters/BW", "Black and white", KeyEvent.VK_A, "run.png", "onBw");
-        addMenuItem("Filters/Sharpness", "Sharpness", KeyEvent.VK_A, "run.png", "onSharpness");
-        addMenuItem("Filters/Stamp", "Stamp", KeyEvent.VK_A, "run.png", "onStamp");
-        addMenuItem("Filters/Floyd-Steinberg", "Floyd-Steinberg dithering", KeyEvent.VK_A, "run.png", "onFloydSteinberg");
-        addMenuItem("Filters/Ordered dithering", "Ordered dithering", KeyEvent.VK_A, "run.png", "onOrderedDithering");
-        addMenuItem("Filters/Aquarelle", "Aquarelle", KeyEvent.VK_A, "run.png", "onAquarelle");
-        addMenuItem("Filters/Roberts", "Roberts", KeyEvent.VK_A, "run.png", "onRoberts");
-        addMenuItem("Filters/Rotation", "Rotation", KeyEvent.VK_A, "run.png", "onRotation");
-        addMenuItem("Filters/Zoom", "Zoom", KeyEvent.VK_A, "run.png", "onZoom");
-        addMenuItem("Filters/Gamma", "Gamma", KeyEvent.VK_A, "run.png", "onGamma");
+        menuItems.add(addMenuItem("Filters/BW", "Black and white", KeyEvent.VK_A, "button_bw.png", "onBw"));
+        menuItems.add(addMenuItem("Filters/Blur", "Blur", KeyEvent.VK_O, "button_bl.png", "onBlur"));
+        menuItems.add(addMenuItem("Filters/Negative", "Negative", KeyEvent.VK_S, "button_ne.png", "onNegative"));
+        menuItems.add(addMenuItem("Filters/Sharpness", "Sharpness", KeyEvent.VK_A, "button_sh.png", "onSharpness"));
+        menuItems.add(addMenuItem("Filters/Stamp", "Stamp", KeyEvent.VK_A, "button_st.png", "onStamp"));
+        menuItems.add(addMenuItem("Filters/Floyd-Steinberg", "Floyd-Steinberg dithering", KeyEvent.VK_A, "button_fl.png", "onFloydSteinberg"));
+        menuItems.add(addMenuItem("Filters/Ordered dithering", "Ordered dithering", KeyEvent.VK_A, "button_or.png", "onOrderedDithering"));
+        menuItems.add(addMenuItem("Filters/Aquarelle", "Aquarelle", KeyEvent.VK_A, "button_aq.png", "onAquarelle"));
+        menuItems.add(addMenuItem("Filters/Roberts", "Roberts", KeyEvent.VK_A, "button_ro.png", "onRoberts"));
+        menuItems.add(addMenuItem("Filters/Rotation", "Rotation", KeyEvent.VK_A, "rotate.png", "onRotation"));
+        menuItems.add(addMenuItem("Filters/Zoom", "Zoom", KeyEvent.VK_A, "zoom.png", "onZoom"));
+        menuItems.add(addMenuItem("Filters/Gamma", "Gamma", KeyEvent.VK_A, "button_ga.png", "onGamma"));
+        menuItems.add(addMenuItem("Filters/Sobel", "Sobel", KeyEvent.VK_A, "button_so.png", "onSobel"));
+        menuItems.add(addMenuItem("Filters/Copy C to B", "Copy image from zone C to zone B", KeyEvent.VK_A, "right.png", "onCopy"));
 
         addSubMenu("Help", KeyEvent.VK_H);
         addMenuItem("Help/About", "Show program version and copyright information", KeyEvent.VK_A, "about.png", "onAbout");
@@ -108,7 +133,7 @@ public class InitMainWindow extends MainFrame {
 
     public void onAbout() {
         JOptionPane.showMessageDialog(this,
-                "Sample, version 0.9\nEvtushenko Ilya, 14203 FIT NSU", "About Init",
+                "Version 1.0\nEvtushenko Ilya, 14203 FIT NSU", "About",
                 JOptionPane.INFORMATION_MESSAGE);
     }
 
@@ -121,8 +146,8 @@ public class InitMainWindow extends MainFrame {
         int res = fileChooser.showDialog(this, "Open");
         if (res == JFileChooser.APPROVE_OPTION) {
             try {
-                String path = fileChooser.getSelectedFile().getPath();
-                controller.loadImage(path);
+                file = fileChooser.getSelectedFile().getPath();
+                controller.loadImage(file);
                 chooseItem.setEnabled(true);
                 chooseToggle.setEnabled(true);
             } catch (Exception e) {
@@ -132,11 +157,29 @@ public class InitMainWindow extends MainFrame {
     }
 
     public void onSave() {
-
+        if (file != null) {
+            try (OutputStream out = new FileOutputStream(file)) {
+                ImageIO.write(controller.getImageC(), "png", out);
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(this, "Can not save file", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            onSaveAs();
+        }
     }
 
     public void onSaveAs() {
-
+        JFileChooser fileChooser = new JFileChooser("FIT_14203_Evtushenko_Ilya_Filter_Data");
+        fileChooser.addChoosableFileFilter(new ExtensionFileFilter("png", ""));
+        int res = fileChooser.showDialog(this, "Save");
+        if (res == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            try (OutputStream out = new FileOutputStream(selectedFile)) {
+                ImageIO.write(controller.getImageC(), "png", out);
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(this, "Can not save file", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
 
     public void onChose() {
@@ -160,42 +203,84 @@ public class InitMainWindow extends MainFrame {
     }
 
     public void onFloydSteinberg() {
-        applyFilter(new FilterParameters(FilterType.FLOYD_STEINBERG, new double[]{2., 2., 2.}));
+        new ColorDialog(this, "Floyd-Steinberg dithering", controller, FilterType.FLOYD_STEINBERG);
     }
 
     public void onOrderedDithering() {
-        applyFilter(new FilterParameters(FilterType.ORDERED_DITHERING, new double[]{2, 2, 2}));
+        applyFilter(new FilterParameters(FilterType.ORDERED_DITHERING));
     }
 
     public void onAquarelle() {
-
         applyFilter(new FilterParameters(FilterType.AQUARELLE));
     }
 
     public void onRoberts() {
-
-        applyFilter(new FilterParameters(FilterType.ROBERTS, new double[]{50, 50, 50}));
+        new SingleIntParameterDialog(this,
+                "Roberts",
+                controller,
+                FilterType.ROBERTS,
+                0,
+                255,
+                60);
     }
 
-    public void onRotation(){
-        applyFilter(new FilterParameters(FilterType.ROTATION, new double[]{180}));
+    public void onRotation() {
+        new SingleIntParameterDialog(this,
+                "Rotation",
+                controller,
+                FilterType.ROTATION,
+                -180,
+                180,
+                0);
     }
 
-    public void onZoom(){
+    public void onZoom() {
         applyFilter(new FilterParameters(FilterType.ZOOM));
     }
 
-    public void onGamma(){
-        applyFilter(new FilterParameters(FilterType.GAMMA, new double[]{100.0}));
+    public void onGamma() {
+        new SingleFloatParameterDialog(this,
+                "Gamma",
+                controller,
+                FilterType.GAMMA,
+                0,
+                2,
+                1);
+    }
+
+    public void onSobel() {
+        new SingleIntParameterDialog(this,
+                "Sobel",
+                controller,
+                FilterType.SOBEL,
+                0,
+                255,
+                60);
     }
 
     public void onNegative() {
         applyFilter(new FilterParameters(FilterType.NEGATIVE));
     }
 
+    public void onCopy() {
+        controller.moveLeft();
+    }
+
+    public void onClear(){
+        controller.clear();
+    }
+
     private void applyFilter(FilterParameters parameters) {
-        if (controller.isPartChosen()) {
-            controller.applyFilter(parameters);
-        }
+        controller.applyFilter(parameters);
+    }
+
+    public void setPartChosen(boolean isChosen) {
+        toolbarButtons.forEach(e -> e.setEnabled(isChosen));
+        menuItems.forEach(e -> e.setEnabled(isChosen));
+    }
+
+    public void setChoseEnabled(boolean enabled) {
+        chooseItem.setEnabled(enabled);
+        chooseToggle.setEnabled(enabled);
     }
 }

@@ -18,6 +18,9 @@ public abstract class AbstractDitheringFilter implements Filter {
         blueColors = (int) parameters[2];
     }
 
+    public AbstractDitheringFilter() {
+    }
+
     @Override
     public abstract BufferedImage apply(BufferedImage bufferedImage);
 

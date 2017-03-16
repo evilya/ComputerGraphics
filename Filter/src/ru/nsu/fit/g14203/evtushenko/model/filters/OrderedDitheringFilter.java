@@ -8,8 +8,7 @@ public class OrderedDitheringFilter extends AbstractDitheringFilter {
     private int matrixSize = 4;
     private int[][] matrix;
 
-    public OrderedDitheringFilter(double[] parameters) {
-        super(parameters);
+    public OrderedDitheringFilter() {
         matrix = new int[][]{
                 {0, 8, 2, 10},
                 {12, 4, 14, 6},
@@ -22,12 +21,14 @@ public class OrderedDitheringFilter extends AbstractDitheringFilter {
     @Override
     public BufferedImage apply(BufferedImage source) {
         createMatrix(16);
-        for (int i = 0; i < matrixSize; i++) {
-            for (int j = 0; j < matrixSize; j++) {
-                System.out.print(matrix[i][j] + " ");
-            }
-            System.out.println();
-        }
+//        for (int i = 0; i < matrixSize; i++) {
+//            System.out.print("{");
+//            for (int j = 0; j < matrixSize; j++) {
+//                System.out.print(matrix[i][j] + ", ");
+//            }
+//            System.out.print("}");
+//            System.out.println();
+//        }
         BufferedImage sourceCopy =
                 new BufferedImage(source.getColorModel(),
                         source.copyData(null),
@@ -51,7 +52,7 @@ public class OrderedDitheringFilter extends AbstractDitheringFilter {
 
                 int newGreen =
                         ((double) oldGreen / 255) >
-                                ((double) matrix[y % matrixSize][x % matrixSize] / (matrixSize * matrixSize))? 255 : 0;
+                                ((double) matrix[y % matrixSize][x % matrixSize] / (matrixSize * matrixSize)) ? 255 : 0;
 
                 int newBlue =
                         ((double) oldBlue / 255) >
