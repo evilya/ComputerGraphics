@@ -69,10 +69,13 @@ public class ColorDialog extends JDialog {
         });
 
         cancelButton.addActionListener(e -> {
+            controller.rollback();
             setVisible(false);
             dispose();
         });
 
+        controller.saveState();
+        applyFilter.run();
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         pack();

@@ -109,7 +109,7 @@ public class View extends JPanel implements Observer {
         switch (type) {
             case A:
                 BufferedImage image = controller.getImageA();
-                if (image != null){
+                if (image != null) {
                     image = fitImage(image);
                 }
                 zoneA.setImage(image);

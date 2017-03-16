@@ -16,6 +16,7 @@ public class ExtensionFileFilter extends FileFilter {
         return f.isDirectory() || f.getName().toLowerCase().endsWith("." + extension.toLowerCase());
     }
 
+
     @Override
     public String getDescription() {
         return description + " (*." + extension + ")";

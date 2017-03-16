@@ -9,7 +9,6 @@ import java.io.IOException;
 
 public class Controller {
 
-
     private final InitMainWindow mainWindow;
     private Model model;
 
@@ -33,6 +32,7 @@ public class Controller {
     }
 
     public void applyFilter(FilterParameters parameters) {
+        mainWindow.setSaveEnabled(true);
         model.applyFilter(parameters);
     }
 
@@ -48,10 +48,20 @@ public class Controller {
         return model.getImageC();
     }
 
-    public void clear(){
+    public void clear() {
+        mainWindow.setSaveEnabled(false);
         mainWindow.setChoseEnabled(false);
         mainWindow.setPartChosen(false);
         model.clear();
     }
+
+    public void saveState() {
+        model.saveState();
+    }
+
+    public void rollback() {
+        model.rollback();
+    }
+
 
 }

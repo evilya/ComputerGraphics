@@ -10,12 +10,11 @@ import ru.nsu.fit.g14203.evtushenko.view.dialogs.SingleIntParameterDialog;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.filechooser.*;
+import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,6 +24,8 @@ public class InitMainWindow extends MainFrame {
 
     private Set<JButton> toolbarButtons = new HashSet<>();
     private Set<JMenuItem> menuItems = new HashSet<>();
+    private Set<JButton> saveButtons = new HashSet<>();
+    private Set<JMenuItem> saveItems = new HashSet<>();
 
     private JToggleButton chooseToggle;
     private JRadioButtonMenuItem chooseItem;
@@ -32,6 +33,7 @@ public class InitMainWindow extends MainFrame {
     private Controller controller;
     private View view;
     private String file;
+    private boolean saved;
 
     public InitMainWindow() {
         super(1120, 460, "Filter");
@@ -41,6 +43,8 @@ public class InitMainWindow extends MainFrame {
 
             toolbarButtons.forEach(e -> e.setEnabled(false));
             menuItems.forEach(e -> e.setEnabled(false));
+            saveItems.forEach(e -> e.setEnabled(false));
+            saveButtons.forEach(e -> e.setEnabled(false));
 
             Model model = new Model();
             Thread modelThread = new Thread(model);
@@ -65,13 +69,15 @@ public class InitMainWindow extends MainFrame {
 
     private void initToolbar() throws NoSuchMethodException {
         addToolBarButton("File/Open");
-        toolbarButtons.add(addToolBarButton("File/Save"));
-        toolbarButtons.add(addToolBarButton("File/Save as"));
+        saveButtons.add(addToolBarButton("File/Save"));
+        saveButtons.add(addToolBarButton("File/Save as"));
         toolbarButtons.add(addToolBarButton("File/Clear"));
         addToolBarSeparator();
 
         chooseToggle = addToolBarToggleButton("Filters/Chose");
         chooseToggle.setEnabled(false);
+        chooseToggle.addChangeListener(e -> chooseItem.setSelected(chooseToggle.isSelected()));
+        chooseItem.addChangeListener(e -> chooseToggle.setSelected(chooseItem.isSelected()));
         toolbarButtons.add(addToolBarButton("Filters/BW"));
         toolbarButtons.add(addToolBarButton("Filters/Blur"));
         toolbarButtons.add(addToolBarButton("Filters/Negative"));
@@ -97,9 +103,9 @@ public class InitMainWindow extends MainFrame {
     private void initMenu() throws NoSuchMethodException {
         addSubMenu("File", KeyEvent.VK_F);
         addMenuItem("File/Open", "Open", KeyEvent.VK_O, "open.png", "onOpen");
-        menuItems.add(addMenuItem("File/Save", "Save", KeyEvent.VK_S, "save.png", "onSave"));
-        menuItems.add(addMenuItem("File/Save as", "Save as", KeyEvent.VK_A, "saveas.png", "onSaveAs"));
-        menuItems.add(addMenuItem("File/Clear", "Clear", KeyEvent.VK_A, "saveas.png", "onClear"));
+        saveItems.add(addMenuItem("File/Save", "Save", KeyEvent.VK_S, "save.png", "onSave"));
+        saveItems.add(addMenuItem("File/Save as", "Save as", KeyEvent.VK_A, "saveas.png", "onSaveAs"));
+        menuItems.add(addMenuItem("File/Clear", "Clear", KeyEvent.VK_A, "clear.png", "onClear"));
         addMenuSeparator("File");
         addMenuItem("File/Exit", "Exit", KeyEvent.VK_X, "exit.png", "onExit");
 
@@ -138,11 +144,27 @@ public class InitMainWindow extends MainFrame {
     }
 
     public void onExit() {
-        System.exit(0);
+        if (!saved) {
+            int res = JOptionPane.showConfirmDialog(this,
+                    "Would you like to save?",
+                    "Save",
+                    JOptionPane.YES_NO_CANCEL_OPTION);
+            switch (res) {
+                case JOptionPane.YES_OPTION:
+                    onSaveAs();
+                case JOptionPane.NO_OPTION:
+                    System.exit(0);
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     public void onOpen() {
         JFileChooser fileChooser = new JFileChooser("FIT_14203_Evtushenko_Ilya_Filter_Data");
+        fileChooser.addChoosableFileFilter(new ExtensionFileFilter("png", "PNG24"));
+        fileChooser.addChoosableFileFilter(new ExtensionFileFilter("bmp", "BMP24"));
         int res = fileChooser.showDialog(this, "Open");
         if (res == JFileChooser.APPROVE_OPTION) {
             try {
@@ -160,6 +182,7 @@ public class InitMainWindow extends MainFrame {
         if (file != null) {
             try (OutputStream out = new FileOutputStream(file)) {
                 ImageIO.write(controller.getImageC(), "png", out);
+                saved = true;
             } catch (IOException e) {
                 JOptionPane.showMessageDialog(this, "Can not save file", "Error", JOptionPane.ERROR_MESSAGE);
             }
@@ -170,12 +193,22 @@ public class InitMainWindow extends MainFrame {
 
     public void onSaveAs() {
         JFileChooser fileChooser = new JFileChooser("FIT_14203_Evtushenko_Ilya_Filter_Data");
-        fileChooser.addChoosableFileFilter(new ExtensionFileFilter("png", ""));
+        ExtensionFileFilter bmpFilter = new ExtensionFileFilter("bmp", "BMP24");
+        ExtensionFileFilter pngFilter = new ExtensionFileFilter("png", "PNG24");
+        fileChooser.addChoosableFileFilter(bmpFilter);
+        fileChooser.setFileFilter(pngFilter);
         int res = fileChooser.showDialog(this, "Save");
         if (res == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
             try (OutputStream out = new FileOutputStream(selectedFile)) {
-                ImageIO.write(controller.getImageC(), "png", out);
+                FileFilter filter = fileChooser.getFileFilter();
+                if (filter == bmpFilter) {
+                    ImageIO.write(controller.getImageC(), "bmp", out);
+                } else {
+                    ImageIO.write(controller.getImageC(), "png", out);
+                }
+                saved = true;
+                file = selectedFile.getPath();
             } catch (IOException e) {
                 JOptionPane.showMessageDialog(this, "Can not save file", "Error", JOptionPane.ERROR_MESSAGE);
             }
@@ -203,7 +236,11 @@ public class InitMainWindow extends MainFrame {
     }
 
     public void onFloydSteinberg() {
-        new ColorDialog(this, "Floyd-Steinberg dithering", controller, FilterType.FLOYD_STEINBERG);
+        saved = false;
+        new ColorDialog(this,
+                "Floyd-Steinberg dithering",
+                controller,
+                FilterType.FLOYD_STEINBERG);
     }
 
     public void onOrderedDithering() {
@@ -215,6 +252,7 @@ public class InitMainWindow extends MainFrame {
     }
 
     public void onRoberts() {
+        saved = false;
         new SingleIntParameterDialog(this,
                 "Roberts",
                 controller,
@@ -225,6 +263,7 @@ public class InitMainWindow extends MainFrame {
     }
 
     public void onRotation() {
+        saved = false;
         new SingleIntParameterDialog(this,
                 "Rotation",
                 controller,
@@ -239,6 +278,7 @@ public class InitMainWindow extends MainFrame {
     }
 
     public void onGamma() {
+        saved = false;
         new SingleFloatParameterDialog(this,
                 "Gamma",
                 controller,
@@ -249,13 +289,14 @@ public class InitMainWindow extends MainFrame {
     }
 
     public void onSobel() {
+        saved = false;
         new SingleIntParameterDialog(this,
                 "Sobel",
                 controller,
                 FilterType.SOBEL,
                 0,
                 255,
-                60);
+                110);
     }
 
     public void onNegative() {
@@ -266,11 +307,12 @@ public class InitMainWindow extends MainFrame {
         controller.moveLeft();
     }
 
-    public void onClear(){
+    public void onClear() {
         controller.clear();
     }
 
     private void applyFilter(FilterParameters parameters) {
+        saved = false;
         controller.applyFilter(parameters);
     }
 
@@ -280,7 +322,15 @@ public class InitMainWindow extends MainFrame {
     }
 
     public void setChoseEnabled(boolean enabled) {
+        view.setChoosePart(enabled);
+        chooseItem.setSelected(false);
         chooseItem.setEnabled(enabled);
+        chooseToggle.setSelected(false);
         chooseToggle.setEnabled(enabled);
+    }
+
+    public void setSaveEnabled(boolean enabled) {
+        saveButtons.forEach(e -> e.setEnabled(enabled));
+        saveItems.forEach(e -> e.setEnabled(enabled));
     }
 }

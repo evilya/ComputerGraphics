@@ -41,7 +41,7 @@ public class FloatSliderEditPanel extends JPanel {
             }
         });
         slider.addChangeListener(e -> {
-            field.setValue(slider.getValue()*tick);
+            field.setValue(slider.getValue() * tick);
             listener.run();
         });
 
@@ -53,10 +53,10 @@ public class FloatSliderEditPanel extends JPanel {
             public void focusLost(FocusEvent e) {
                 try {
                     double value = Double.parseDouble(field.getText());
-                    slider.setValue((int) Math.round(value/tick));
+                    slider.setValue((int) Math.round(value / tick));
                     listener.run();
                 } catch (NumberFormatException ex) {
-                    slider.setValue((int) (initial/tick));
+                    slider.setValue((int) (initial / tick));
                     field.setText(initial + "");
                 }
             }

@@ -13,6 +13,9 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 public class Model extends Observable implements Runnable {
+
+    private BufferedImage saved;
+
     private BufferedImage imageA;
     private BufferedImage imageB;
     private BufferedImage imageC;
@@ -112,13 +115,15 @@ public class Model extends Observable implements Runnable {
     }
 
     public void moveLeft() {
-        int width = Math.min(350, imageC.getWidth());
-        int height = Math.min(350, imageC.getHeight());
-        imageB = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = imageB.createGraphics();
-        g.drawImage(imageC, 0,0, null);
-        g.dispose();
-        notifyObservers(EventType.B);
+        if (imageC != null) {
+            int width = Math.min(350, imageC.getWidth());
+            int height = Math.min(350, imageC.getHeight());
+            imageB = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = imageB.createGraphics();
+            g.drawImage(imageC, 0, 0, null);
+            g.dispose();
+            notifyObservers(EventType.B);
+        }
     }
 
     public void clear() {
@@ -127,6 +132,15 @@ public class Model extends Observable implements Runnable {
         imageC = null;
         notifyObservers(EventType.A);
         notifyObservers(EventType.B);
+        notifyObservers(EventType.C);
+    }
+
+    public void saveState() {
+        saved = imageC;
+    }
+
+    public void rollback() {
+        imageC = saved;
         notifyObservers(EventType.C);
     }
 }
