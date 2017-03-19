@@ -3,6 +3,9 @@ package ru.nsu.fit.g14203.evtushenko.view;
 import ru.nsu.fit.g14203.evtushenko.Controller;
 import ru.nsu.fit.g14203.evtushenko.EventType;
 import ru.nsu.fit.g14203.evtushenko.Observer;
+import ru.nsu.fit.g14203.evtushenko.model.Absorption;
+import ru.nsu.fit.g14203.evtushenko.model.Emission;
+import ru.nsu.fit.g14203.evtushenko.model.FileLoader;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,6 +22,10 @@ public class View extends JPanel implements Observer {
     private ImageZone zoneB;
     private ImageZone zoneC;
 
+    private PlotZone<Absorption> plotA;
+    private PlotZone<Emission> plotB;
+
+
     private double scale;
 
     private boolean choosePart;
@@ -31,16 +38,11 @@ public class View extends JPanel implements Observer {
         zoneB = new ImageZone();
         zoneC = new ImageZone();
 
+        plotA = new OnePlotZone(0., 100., 0., 1.);
+        plotB = new ThreePlotZone(0., 100., 0., 255.);
+
 
         zoneA.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (choosePart) {
-                    zoneA.setShowChosen(false);
-                    zoneA.repaint();
-                }
-            }
-
             @Override
             public void mousePressed(MouseEvent e) {
                 if (choosePart) {
@@ -77,6 +79,19 @@ public class View extends JPanel implements Observer {
 
         c.gridx = 2;
         add(zoneC, c);
+
+        c.gridy = 1;
+
+        c.gridx = 0;
+        add(plotA, c);
+
+        c.gridx = 1;
+        add(plotB, c);
+
+        FileLoader loader = new FileLoader("FIT_14203_Evtushenko_Ilya_Filter_Data/test.txt");
+        plotA.setPoints(loader.getAbsorptionPoints());
+        plotB.setPoints(loader.getEmissionPoints());
+        repaint();
 
     }
 

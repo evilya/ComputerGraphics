@@ -1,6 +1,7 @@
 package ru.nsu.fit.g14203.evtushenko.view;
 
 import ru.nsu.fit.g14203.evtushenko.Controller;
+import ru.nsu.fit.g14203.evtushenko.model.FileLoader;
 import ru.nsu.fit.g14203.evtushenko.model.FilterParameters;
 import ru.nsu.fit.g14203.evtushenko.model.Model;
 import ru.nsu.fit.g14203.evtushenko.utils.ExtensionFileFilter;
@@ -36,7 +37,7 @@ public class InitMainWindow extends MainFrame {
     private boolean saved;
 
     public InitMainWindow() {
-        super(1120, 460, "Filter");
+        super(1120, 620, "Filter");
         try {
             initMenu();
             initToolbar();
