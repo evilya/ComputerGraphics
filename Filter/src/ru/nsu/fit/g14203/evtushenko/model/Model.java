@@ -9,8 +9,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
+import java.util.List;
+import java.util.concurrent.*;
 
 public class Model extends Observable implements Runnable {
 
@@ -21,6 +21,11 @@ public class Model extends Observable implements Runnable {
     private BufferedImage imageC;
 
     private BlockingQueue<FilterParameters> taskQueue = new ArrayBlockingQueue<>(5);
+
+    private List<Emission> emissionPoints;
+    private List<Absorption> absorptionPoints;
+    private List<Charge> charges;
+    private FileLoader loader;
 
     public void loadImage(String path) throws IOException {
         imageA = ImageIO.read(new File(path));
@@ -105,6 +110,9 @@ public class Model extends Observable implements Runnable {
                     case SOBEL:
                         filter = new SobelFilter(parameters.getParameters());
                         break;
+                    case VOLUME_RENDERING:
+                        filter = new VolumeRendering(parameters.getParameters(), this);
+                        break;
                 }
                 imageC = filter.apply(imageB);
                 notifyObservers(EventType.C);
@@ -143,4 +151,33 @@ public class Model extends Observable implements Runnable {
         imageC = saved;
         notifyObservers(EventType.C);
     }
+
+    public List<Emission> getEmissionPoints() {
+        return emissionPoints;
+    }
+
+    public List<Absorption> getAbsorptionPoints() {
+        return absorptionPoints;
+    }
+
+    public List<Charge> getCharges() {
+        return charges;
+    }
+
+    public double[] getAbsorption() {
+        return loader.getAbsorption();
+    }
+
+    public int[][] getEmission() {
+        return loader.getEmission();
+    }
+
+    public void loadRenderingParameters(String pathname) {
+        loader = new FileLoader(pathname);
+        absorptionPoints = loader.getAbsorptionPoints();
+        emissionPoints = loader.getEmissionPoints();
+        charges = loader.getCharges();
+        notifyObservers(EventType.PLOT);
+    }
+
 }

@@ -1,11 +1,15 @@
 package ru.nsu.fit.g14203.evtushenko;
 
+import ru.nsu.fit.g14203.evtushenko.model.Absorption;
+import ru.nsu.fit.g14203.evtushenko.model.Emission;
 import ru.nsu.fit.g14203.evtushenko.model.FilterParameters;
 import ru.nsu.fit.g14203.evtushenko.model.Model;
 import ru.nsu.fit.g14203.evtushenko.view.InitMainWindow;
+import ru.nsu.fit.g14203.evtushenko.view.View;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.List;
 
 public class Controller {
 
@@ -64,4 +68,16 @@ public class Controller {
     }
 
 
+    public List<Absorption> getAbsorptionPoints() {
+        return model.getAbsorptionPoints();
+    }
+
+
+    public List<Emission> getEmissionPoints() {
+        return model.getEmissionPoints();
+    }
+
+    public void loadRenderingParameters(String pathname) {
+        model.loadRenderingParameters(pathname);
+    }
 }

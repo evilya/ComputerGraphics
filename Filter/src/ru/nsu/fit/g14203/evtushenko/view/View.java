@@ -38,8 +38,8 @@ public class View extends JPanel implements Observer {
         zoneB = new ImageZone();
         zoneC = new ImageZone();
 
-        plotA = new OnePlotZone(0., 100., 0., 1.);
-        plotB = new ThreePlotZone(0., 100., 0., 255.);
+        plotA = new OnePlotZone(100., 1.);
+        plotB = new ThreePlotZone(100., 255.);
 
 
         zoneA.addMouseListener(new MouseAdapter() {
@@ -87,12 +87,6 @@ public class View extends JPanel implements Observer {
 
         c.gridx = 1;
         add(plotB, c);
-
-        FileLoader loader = new FileLoader("FIT_14203_Evtushenko_Ilya_Filter_Data/test.txt");
-        plotA.setPoints(loader.getAbsorptionPoints());
-        plotB.setPoints(loader.getEmissionPoints());
-        repaint();
-
     }
 
     private void updateChosen(int x, int y) {
@@ -135,6 +129,10 @@ public class View extends JPanel implements Observer {
             case C:
                 zoneC.setImage(controller.getImageC());
                 break;
+            case PLOT:
+                plotA.setPoints(controller.getAbsorptionPoints());
+                plotB.setPoints(controller.getEmissionPoints());
+                break;
         }
     }
 
@@ -159,12 +157,9 @@ public class View extends JPanel implements Observer {
         }
     }
 
-    public boolean isChoosePart() {
-        return choosePart;
-    }
-
     public void setChoosePart(boolean choosePart) {
         this.choosePart = choosePart;
+        zoneA.setShowChosen(choosePart);
     }
 
 }

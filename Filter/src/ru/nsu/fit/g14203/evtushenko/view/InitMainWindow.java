@@ -1,7 +1,6 @@
 package ru.nsu.fit.g14203.evtushenko.view;
 
 import ru.nsu.fit.g14203.evtushenko.Controller;
-import ru.nsu.fit.g14203.evtushenko.model.FileLoader;
 import ru.nsu.fit.g14203.evtushenko.model.FilterParameters;
 import ru.nsu.fit.g14203.evtushenko.model.Model;
 import ru.nsu.fit.g14203.evtushenko.utils.ExtensionFileFilter;
@@ -11,11 +10,13 @@ import ru.nsu.fit.g14203.evtushenko.view.dialogs.SingleIntParameterDialog;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.filechooser.*;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -30,11 +31,13 @@ public class InitMainWindow extends MainFrame {
 
     private JToggleButton chooseToggle;
     private JRadioButtonMenuItem chooseItem;
+    private JMenuItem renderingRunItem;
+    private JButton renderingRunButton;
 
     private Controller controller;
+    private boolean saved;
     private View view;
     private String file;
-    private boolean saved;
 
     public InitMainWindow() {
         super(1120, 620, "Filter");
@@ -70,12 +73,12 @@ public class InitMainWindow extends MainFrame {
 
     private void initToolbar() throws NoSuchMethodException {
         addToolBarButton("File/Open");
+        addToolBarButton("File/Clear");
         saveButtons.add(addToolBarButton("File/Save"));
         saveButtons.add(addToolBarButton("File/Save as"));
-        toolbarButtons.add(addToolBarButton("File/Clear"));
         addToolBarSeparator();
 
-        chooseToggle = addToolBarToggleButton("Filters/Chose");
+        chooseToggle = addToolBarToggleButton("Filters/Choose");
         chooseToggle.setEnabled(false);
         chooseToggle.addChangeListener(e -> chooseItem.setSelected(chooseToggle.isSelected()));
         chooseItem.addChangeListener(e -> chooseToggle.setSelected(chooseItem.isSelected()));
@@ -97,6 +100,10 @@ public class InitMainWindow extends MainFrame {
         toolbarButtons.add(addToolBarButton("Filters/Zoom"));
         toolbarButtons.add(addToolBarButton("Filters/Copy C to B"));
         addToolBarSeparator();
+        toolbarButtons.add(addToolBarButton("Volume rendering/Load"));
+        renderingRunButton = addToolBarButton("Volume rendering/Run");
+        renderingRunButton.setEnabled(false);
+        addToolBarSeparator();
         toolbarButtons.add(addToolBarButton("Help/About"));
         toolbarButtons.add(addToolBarButton("File/Exit"));
     }
@@ -111,7 +118,7 @@ public class InitMainWindow extends MainFrame {
         addMenuItem("File/Exit", "Exit", KeyEvent.VK_X, "exit.png", "onExit");
 
         addSubMenu("Filters", KeyEvent.VK_I);
-        chooseItem = (JRadioButtonMenuItem) addRadioMenuItem("Filters/Chose", "Chose", KeyEvent.VK_O, "select.png", "onChose");
+        chooseItem = (JRadioButtonMenuItem) addRadioMenuItem("Filters/Choose", "Choose", KeyEvent.VK_O, "select.png", "onChose");
         chooseItem.setEnabled(false);
         menuItems.add(addMenuItem("Filters/BW", "Black and white", KeyEvent.VK_A, "button_bw.png", "onBw"));
         menuItems.add(addMenuItem("Filters/Blur", "Blur", KeyEvent.VK_O, "button_bl.png", "onBlur"));
@@ -127,6 +134,11 @@ public class InitMainWindow extends MainFrame {
         menuItems.add(addMenuItem("Filters/Gamma", "Gamma", KeyEvent.VK_A, "button_ga.png", "onGamma"));
         menuItems.add(addMenuItem("Filters/Sobel", "Sobel", KeyEvent.VK_A, "button_so.png", "onSobel"));
         menuItems.add(addMenuItem("Filters/Copy C to B", "Copy image from zone C to zone B", KeyEvent.VK_A, "right.png", "onCopy"));
+        addSubMenu("Volume rendering", KeyEvent.VK_I);
+        menuItems.add(addMenuItem("Volume rendering/Load", "Load rendering parameters", KeyEvent.VK_A, "open.png", "onLoadParameters"));
+
+        renderingRunItem = addMenuItem("Volume rendering/Run", "Load rendering parameters", KeyEvent.VK_A, "run.png", "onRenderingRun");
+        renderingRunItem.setEnabled(false);
 
         addSubMenu("Help", KeyEvent.VK_H);
         addMenuItem("Help/About", "Show program version and copyright information", KeyEvent.VK_A, "about.png", "onAbout");
@@ -300,6 +312,10 @@ public class InitMainWindow extends MainFrame {
                 110);
     }
 
+    public void onRenderingRun() {
+        applyFilter(new FilterParameters(FilterType.VOLUME_RENDERING, new double[]{350., 350., 350.}));
+    }
+
     public void onNegative() {
         applyFilter(new FilterParameters(FilterType.NEGATIVE));
     }
@@ -309,7 +325,26 @@ public class InitMainWindow extends MainFrame {
     }
 
     public void onClear() {
+        view.setChoosePart(false);
         controller.clear();
+        renderingRunItem.setEnabled(false);
+        renderingRunButton.setEnabled(false);
+    }
+
+    public void onLoadParameters() {
+        JFileChooser fileChooser = new JFileChooser("FIT_14203_Evtushenko_Ilya_Filter_Data");
+        fileChooser.addChoosableFileFilter(new ExtensionFileFilter("txt", ""));
+        int res = fileChooser.showDialog(this, "Open");
+        if (res == JFileChooser.APPROVE_OPTION) {
+            try {
+                file = fileChooser.getSelectedFile().getPath();
+                controller.loadRenderingParameters(file);
+                renderingRunButton.setEnabled(true);
+                renderingRunItem.setEnabled(true);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Can not open file");
+            }
+        }
     }
 
     private void applyFilter(FilterParameters parameters) {

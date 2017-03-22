@@ -11,6 +11,7 @@ public class FileLoader {
     private final List<Absorption> absorptionPoints = new ArrayList<>();
 
     private final List<Emission> emissionPoints = new ArrayList<>();
+    private final List<Charge> charges = new ArrayList<>();
 
     private double[] absorption = new double[101];
     private int[][] emission = new int[101][3];
@@ -19,6 +20,7 @@ public class FileLoader {
         try (Scanner scanner = new Scanner(new File(path))) {
             readAbsorptions(scanner);
             readEmissions(scanner);
+            readCharges(scanner);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -41,8 +43,8 @@ public class FileLoader {
                 emission[cur.x][2] = cur.blue;
                 for (int i = 1; i < cur.x - prevEm.x; i++) {
                     double redIncrement = (double) (cur.red - prevEm.red) / (cur.x - prevEm.x);
-                    double greenIncrement = (double)(cur.green - prevEm.green) / (cur.x - prevEm.x);
-                    double blueIncrement = (double)(cur.blue - prevEm.blue) / (cur.x - prevEm.x);
+                    double greenIncrement = (double) (cur.green - prevEm.green) / (cur.x - prevEm.x);
+                    double blueIncrement = (double) (cur.blue - prevEm.blue) / (cur.x - prevEm.x);
                     emission[i + prevEm.x][0] = (int) (prevEm.red + i * redIncrement);
                     emission[i + prevEm.x][1] = (int) (prevEm.green + i * greenIncrement);
                     emission[i + prevEm.x][2] = (int) (prevEm.blue + i * blueIncrement);
@@ -52,12 +54,17 @@ public class FileLoader {
         }
     }
 
+
     public List<Absorption> getAbsorptionPoints() {
         return absorptionPoints;
     }
 
     public List<Emission> getEmissionPoints() {
         return emissionPoints;
+    }
+
+    public List<Charge> getCharges() {
+        return charges;
     }
 
     public double[] getAbsorption() {
@@ -108,6 +115,16 @@ public class FileLoader {
         emissionPoints.add(emission);
     }
 
+    private void readCharges(Scanner scanner){
+        int numOfCharges = Integer.parseInt(readNextNumbers(scanner, 1)[0]);
+        if (numOfCharges < 1) {
+            throw new IllegalArgumentException();
+        }
+        for (int i = 0; i < numOfCharges; i++) {
+            charges.add(readNextCharge(scanner));
+        }
+    }
+
     private Absorption readNextAbsorption(Scanner scanner) {
         String[] numbers = readNextNumbers(scanner, 2);
         int x = Integer.parseInt(numbers[0]);
@@ -131,6 +148,15 @@ public class FileLoader {
             throw new IllegalArgumentException();
         }
         return new Emission(x, red, green, blue);
+    }
+
+    private Charge readNextCharge(Scanner scanner){
+        String[] numbers = readNextNumbers(scanner, 4);
+        double x = Double.parseDouble(numbers[0]);
+        double y = Double.parseDouble(numbers[1]);
+        double z = Double.parseDouble(numbers[2]);
+        double q = Double.parseDouble(numbers[3]);
+        return new Charge(x, y, z, q);
     }
 
     private String[] readNextNumbers(Scanner scanner, int n) {
