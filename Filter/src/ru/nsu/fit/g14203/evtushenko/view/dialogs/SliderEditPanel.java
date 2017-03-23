@@ -34,7 +34,9 @@ public class SliderEditPanel extends JPanel {
         });
         slider.addChangeListener(e -> {
             field.setValue(slider.getValue());
-            listener.run();
+            if (listener != null) {
+                listener.run();
+            }
         });
 
         field.setSize(new Dimension(75, 30));
@@ -46,7 +48,9 @@ public class SliderEditPanel extends JPanel {
                 try {
                     int value = Integer.parseInt(field.getText());
                     slider.setValue(value);
-                    listener.run();
+                    if (listener != null) {
+                        listener.run();
+                    }
                 } catch (NumberFormatException ex) {
                     slider.setValue(initial);
                     field.setText(initial + "");

@@ -4,9 +4,9 @@ import ru.nsu.fit.g14203.evtushenko.Controller;
 import ru.nsu.fit.g14203.evtushenko.model.FilterParameters;
 import ru.nsu.fit.g14203.evtushenko.model.Model;
 import ru.nsu.fit.g14203.evtushenko.utils.ExtensionFileFilter;
-import ru.nsu.fit.g14203.evtushenko.view.dialogs.ColorDialog;
 import ru.nsu.fit.g14203.evtushenko.view.dialogs.SingleFloatParameterDialog;
 import ru.nsu.fit.g14203.evtushenko.view.dialogs.SingleIntParameterDialog;
+import ru.nsu.fit.g14203.evtushenko.view.dialogs.ThreeIntsDialog;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -24,10 +24,10 @@ import static ru.nsu.fit.g14203.evtushenko.model.FilterParameters.FilterType;
 
 public class InitMainWindow extends MainFrame {
 
-    private Set<JButton> toolbarButtons = new HashSet<>();
-    private Set<JMenuItem> menuItems = new HashSet<>();
-    private Set<JButton> saveButtons = new HashSet<>();
-    private Set<JMenuItem> saveItems = new HashSet<>();
+    private Set<Component> toolbarButtons = new HashSet<>();
+    private Set<Component> menuItems = new HashSet<>();
+    private Set<Component> saveButtons = new HashSet<>();
+    private Set<Component> saveItems = new HashSet<>();
 
     private JToggleButton chooseToggle;
     private JRadioButtonMenuItem chooseItem;
@@ -38,6 +38,10 @@ public class InitMainWindow extends MainFrame {
     private boolean saved;
     private View view;
     private String file;
+    private JMenuItem emissionItem;
+    private JMenuItem absorptionItem;
+    private JToggleButton emissionToggle;
+    private JToggleButton absorptionToggle;
 
     public InitMainWindow() {
         super(1120, 620, "Filter");
@@ -63,7 +67,6 @@ public class InitMainWindow extends MainFrame {
             flowPane.setPreferredSize(new Dimension(1100, 370));
             flowPane.add(view);
             add(scrollPane);
-
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -101,11 +104,21 @@ public class InitMainWindow extends MainFrame {
         toolbarButtons.add(addToolBarButton("Filters/Copy C to B"));
         addToolBarSeparator();
         toolbarButtons.add(addToolBarButton("Volume rendering/Load"));
+        emissionToggle = addToolBarToggleButton("Volume rendering/Emission");
+        toolbarButtons.add(emissionToggle);
+        absorptionToggle = addToolBarToggleButton("Volume rendering/Absorption");
+        toolbarButtons.add(absorptionToggle);
         renderingRunButton = addToolBarButton("Volume rendering/Run");
         renderingRunButton.setEnabled(false);
         addToolBarSeparator();
         toolbarButtons.add(addToolBarButton("Help/About"));
         toolbarButtons.add(addToolBarButton("File/Exit"));
+
+        emissionItem.addChangeListener(e -> emissionToggle.setSelected(emissionItem.isSelected()));
+        emissionToggle.addChangeListener(e -> emissionItem.setSelected(emissionToggle.isSelected()));
+
+        absorptionItem.addChangeListener(e -> absorptionToggle.setSelected(absorptionItem.isSelected()));
+        absorptionToggle.addChangeListener(e -> absorptionItem.setSelected(absorptionToggle.isSelected()));
     }
 
     private void initMenu() throws NoSuchMethodException {
@@ -136,6 +149,10 @@ public class InitMainWindow extends MainFrame {
         menuItems.add(addMenuItem("Filters/Copy C to B", "Copy image from zone C to zone B", KeyEvent.VK_A, "right.png", "onCopy"));
         addSubMenu("Volume rendering", KeyEvent.VK_I);
         menuItems.add(addMenuItem("Volume rendering/Load", "Load rendering parameters", KeyEvent.VK_A, "open.png", "onLoadParameters"));
+        emissionItem = addRadioMenuItem("Volume rendering/Emission", "Enable emission", KeyEvent.VK_A, "xor.png", "onEmission");
+        menuItems.add(emissionItem);
+        absorptionItem = addRadioMenuItem("Volume rendering/Absorption", "Enable absorption", KeyEvent.VK_A, "replace.png", "onAbsorption");
+        menuItems.add(absorptionItem);
 
         renderingRunItem = addMenuItem("Volume rendering/Run", "Load rendering parameters", KeyEvent.VK_A, "run.png", "onRenderingRun");
         renderingRunItem.setEnabled(false);
@@ -181,6 +198,7 @@ public class InitMainWindow extends MainFrame {
         int res = fileChooser.showDialog(this, "Open");
         if (res == JFileChooser.APPROVE_OPTION) {
             try {
+                onClear();
                 file = fileChooser.getSelectedFile().getPath();
                 controller.loadImage(file);
                 chooseItem.setEnabled(true);
@@ -206,22 +224,15 @@ public class InitMainWindow extends MainFrame {
 
     public void onSaveAs() {
         JFileChooser fileChooser = new JFileChooser("FIT_14203_Evtushenko_Ilya_Filter_Data");
-        ExtensionFileFilter bmpFilter = new ExtensionFileFilter("bmp", "BMP24");
         ExtensionFileFilter pngFilter = new ExtensionFileFilter("png", "PNG24");
-        fileChooser.addChoosableFileFilter(bmpFilter);
         fileChooser.setFileFilter(pngFilter);
         int res = fileChooser.showDialog(this, "Save");
         if (res == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = fileChooser.getSelectedFile();
+            String selectedFile = fileChooser.getSelectedFile().getPath()+".png";
             try (OutputStream out = new FileOutputStream(selectedFile)) {
-                FileFilter filter = fileChooser.getFileFilter();
-                if (filter == bmpFilter) {
-                    ImageIO.write(controller.getImageC(), "bmp", out);
-                } else {
-                    ImageIO.write(controller.getImageC(), "png", out);
-                }
+                ImageIO.write(controller.getImageC(), "png", out);
                 saved = true;
-                file = selectedFile.getPath();
+                file = selectedFile;
             } catch (IOException e) {
                 JOptionPane.showMessageDialog(this, "Can not save file", "Error", JOptionPane.ERROR_MESSAGE);
             }
@@ -250,10 +261,14 @@ public class InitMainWindow extends MainFrame {
 
     public void onFloydSteinberg() {
         saved = false;
-        new ColorDialog(this,
+        new ThreeIntsDialog(this,
                 "Floyd-Steinberg dithering",
                 controller,
-                FilterType.FLOYD_STEINBERG);
+                new FilterParameters(FilterType.FLOYD_STEINBERG, new double[0]),
+                new String[]{"Red", "Green", "Blue"},
+                new int[]{2, 2, 2},
+                new int[]{256, 256, 256},
+                true);
     }
 
     public void onOrderedDithering() {
@@ -313,7 +328,20 @@ public class InitMainWindow extends MainFrame {
     }
 
     public void onRenderingRun() {
-        applyFilter(new FilterParameters(FilterType.VOLUME_RENDERING, new double[]{350., 350., 350.}));
+        saved = false;
+        new ThreeIntsDialog(this,
+                "Volume rendering parameters",
+                controller,
+                new FilterParameters(
+                        FilterType.VOLUME_RENDERING,
+                        new double[]{
+                                emissionItem.isSelected() ? 1. : 0.,
+                                absorptionItem.isSelected() ? 1. : 0.,
+                        }),
+                new String[]{"Nx", "Ny", "Nz"},
+                new int[]{4, 4, 4},
+                new int[]{350, 350, 350},
+                false);
     }
 
     public void onNegative() {
@@ -322,6 +350,12 @@ public class InitMainWindow extends MainFrame {
 
     public void onCopy() {
         controller.moveLeft();
+    }
+
+    public void onEmission() {
+    }
+
+    public void onAbsorption() {
     }
 
     public void onClear() {

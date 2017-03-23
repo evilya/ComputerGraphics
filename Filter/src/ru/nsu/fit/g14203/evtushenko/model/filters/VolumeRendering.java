@@ -16,6 +16,8 @@ import java.util.concurrent.Future;
 public class VolumeRendering implements Filter {
 
     private final static ExecutorService EXECUTOR = Executors.newFixedThreadPool(4);
+    private final boolean emissionEnabled;
+    private final boolean absorptionEnabled;
 
     private Model model;
 
@@ -30,9 +32,11 @@ public class VolumeRendering implements Filter {
     private double dz;
 
     public VolumeRendering(double[] parameters, Model model) {
-        maxX = (int) parameters[0];
-        maxY = (int) parameters[1];
-        maxZ = (int) parameters[2];
+        emissionEnabled = (int) parameters[0] == 1;
+        absorptionEnabled = (int) parameters[1] == 1;
+        maxX = (int) parameters[2];
+        maxY = (int) parameters[3];
+        maxZ = (int) parameters[4];
         dx = 1. / maxX;
         dy = 1. / maxY;
         dz = 1. / maxZ;
@@ -60,7 +64,7 @@ public class VolumeRendering implements Filter {
                 f.get();
             }
         } catch (InterruptedException | ExecutionException e) {
-            return null;
+            e.printStackTrace();
         }
         return result;
     }
@@ -71,12 +75,12 @@ public class VolumeRendering implements Filter {
         double green = (double) color.getGreen() / 255;
         double blue = (double) color.getBlue() / 255;
         for (int z = 0; z < maxZ; z++) {
-            double value = calculateFunction(x / (350 / maxX), y / (350 / maxY), z);
+            double value = calculateFunction(x * maxX / (350), y * maxY / (350), z);
             int quant = (int) Math.round((value - fMin) / (fMax - fMin) * 100);
-            double absorption = Math.exp(-(model.getAbsorption()[quant] * dz));
-            red = red * absorption + (double) model.getEmission()[quant][0] / 255 * dz;
-            green = green * absorption + (double) model.getEmission()[quant][1] / 255 * dz;
-            blue = blue * absorption + (double) model.getEmission()[quant][2] / 255 * dz;
+            double absorption = absorptionEnabled ? Math.exp(-(model.getAbsorption()[quant] * dz)) : 1.;
+            red = red * absorption + (emissionEnabled ? (double) model.getEmission()[quant][0] / 255 * dz : 0);
+            green = green * absorption + (emissionEnabled ? (double) model.getEmission()[quant][1] / 255 * dz : 0);
+            blue = blue * absorption + (emissionEnabled ? (double) model.getEmission()[quant][2] / 255 * dz : 0);
         }
         result.setRGB(x, y, new Color
                 (MathUtils.constraint((int) (red * 255)),
