@@ -6,22 +6,25 @@ import ru.nsu.fit.g14203.evtushenko.utils.MathUtils;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Future;
 
 public class VolumeRendering implements Filter {
+
+    private final static ExecutorService EXECUTOR = Executors.newFixedThreadPool(4);
 
     private Model model;
 
     private double fMax;
     private double fMin;
-
     private int maxX;
     private int maxY;
     private int maxZ;
 
-    private final ExecutorService executor = Executors.newFixedThreadPool(4);
     private double dx;
     private double dy;
     private double dz;
@@ -44,23 +47,25 @@ public class VolumeRendering implements Filter {
 
         findMinMax();
 
+        List<Future<Void>> futures = new ArrayList<>();
         for (int x = 0; x < source.getWidth(); x++) {
             for (int y = 0; y < source.getHeight(); y++) {
                 int finalY = y;
                 int finalX = x;
-                executor.submit(() -> renderPixel(source, result, finalX, finalY));
+                futures.add(EXECUTOR.submit(() -> renderPixel(source, result, finalX, finalY)));
             }
         }
-        executor.shutdown();
         try {
-            executor.awaitTermination(1, TimeUnit.MINUTES);
-        } catch (InterruptedException e) {
+            for (Future<Void> f : futures) {
+                f.get();
+            }
+        } catch (InterruptedException | ExecutionException e) {
             return null;
         }
         return result;
     }
 
-    private void renderPixel(BufferedImage source, BufferedImage result, int x, int y) {
+    private Void renderPixel(BufferedImage source, BufferedImage result, int x, int y) {
         Color color = new Color(source.getRGB(x, y));
         double red = (double) color.getRed() / 255;
         double green = (double) color.getGreen() / 255;
@@ -77,6 +82,7 @@ public class VolumeRendering implements Filter {
                 (MathUtils.constraint((int) (red * 255)),
                         MathUtils.constraint((int) (green * 255)),
                         MathUtils.constraint((int) (blue * 255))).getRGB());
+        return null;
     }
 
     private double calculateFunction(int x, int y, int z) {
