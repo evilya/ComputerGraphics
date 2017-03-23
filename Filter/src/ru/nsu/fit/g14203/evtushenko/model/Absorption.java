@@ -2,13 +2,12 @@ package ru.nsu.fit.g14203.evtushenko.model;
 
 public class Absorption {
 
+    int x;
+    double value;
     public Absorption(int x, double value) {
         this.x = x;
         this.value = value;
     }
-
-    int x;
-    double value;
 
     public int getX() {
         return x;

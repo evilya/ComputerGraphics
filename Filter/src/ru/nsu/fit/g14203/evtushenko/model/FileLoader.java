@@ -115,7 +115,7 @@ public class FileLoader {
         emissionPoints.add(emission);
     }
 
-    private void readCharges(Scanner scanner){
+    private void readCharges(Scanner scanner) {
         int numOfCharges = Integer.parseInt(readNextNumbers(scanner, 1)[0]);
         if (numOfCharges < 1) {
             throw new IllegalArgumentException();
@@ -150,7 +150,7 @@ public class FileLoader {
         return new Emission(x, red, green, blue);
     }
 
-    private Charge readNextCharge(Scanner scanner){
+    private Charge readNextCharge(Scanner scanner) {
         String[] numbers = readNextNumbers(scanner, 4);
         double x = Double.parseDouble(numbers[0]);
         double y = Double.parseDouble(numbers[1]);

@@ -2,7 +2,6 @@ package ru.nsu.fit.g14203.evtushenko.view;
 
 import ru.nsu.fit.g14203.evtushenko.model.Absorption;
 
-import javax.swing.*;
 import java.awt.*;
 import java.util.Iterator;
 import java.util.List;

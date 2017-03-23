@@ -1,17 +1,16 @@
 package ru.nsu.fit.g14203.evtushenko.model;
 
-public  class Emission {
+public class Emission {
+    int x;
+    int red;
+    int green;
+    int blue;
     Emission(int x, int red, int green, int blue) {
         this.x = x;
         this.red = red;
         this.green = green;
         this.blue = blue;
     }
-
-    int x;
-    int red;
-    int green;
-    int blue;
 
     public int getX() {
         return x;

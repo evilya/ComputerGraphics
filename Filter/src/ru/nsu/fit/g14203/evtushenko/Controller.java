@@ -5,7 +5,6 @@ import ru.nsu.fit.g14203.evtushenko.model.Emission;
 import ru.nsu.fit.g14203.evtushenko.model.FilterParameters;
 import ru.nsu.fit.g14203.evtushenko.model.Model;
 import ru.nsu.fit.g14203.evtushenko.view.InitMainWindow;
-import ru.nsu.fit.g14203.evtushenko.view.View;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;

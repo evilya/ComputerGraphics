@@ -5,7 +5,6 @@ import ru.nsu.fit.g14203.evtushenko.EventType;
 import ru.nsu.fit.g14203.evtushenko.Observer;
 import ru.nsu.fit.g14203.evtushenko.model.Absorption;
 import ru.nsu.fit.g14203.evtushenko.model.Emission;
-import ru.nsu.fit.g14203.evtushenko.model.FileLoader;
 
 import javax.swing.*;
 import java.awt.*;

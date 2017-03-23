@@ -23,19 +23,21 @@ public abstract class PlotZone<T> extends JPanel {
         return new Dimension(width, height);
     }
 
+    public List<T> getPoints() {
+        return points;
+    }
+
     public void setPoints(List<T> points) {
         this.points = points;
         repaint();
     }
 
-    public List<T> getPoints() {
-        return points;
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
     }
 
-    @Override
-    protected void paintComponent(Graphics g){
-        super.paintComponent(g);
-    };
+    ;
 
     public double getMaxX() {
         return maxX;

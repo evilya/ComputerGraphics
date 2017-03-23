@@ -10,10 +10,8 @@ import ru.nsu.fit.g14203.evtushenko.view.dialogs.ThreeIntsDialog;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -72,6 +70,11 @@ public class InitMainWindow extends MainFrame {
             throw new RuntimeException(e);
         }
 
+    }
+
+    public static void main(String[] args) {
+        InitMainWindow mainFrame = new InitMainWindow();
+        mainFrame.setVisible(true);
     }
 
     private void initToolbar() throws NoSuchMethodException {
@@ -161,12 +164,6 @@ public class InitMainWindow extends MainFrame {
         addMenuItem("Help/About", "Show program version and copyright information", KeyEvent.VK_A, "about.png", "onAbout");
     }
 
-    public static void main(String[] args) {
-        InitMainWindow mainFrame = new InitMainWindow();
-        mainFrame.setVisible(true);
-    }
-
-
     public void onAbout() {
         JOptionPane.showMessageDialog(this,
                 "Version 1.0\nEvtushenko Ilya, 14203 FIT NSU", "About",
@@ -228,7 +225,7 @@ public class InitMainWindow extends MainFrame {
         fileChooser.setFileFilter(pngFilter);
         int res = fileChooser.showDialog(this, "Save");
         if (res == JFileChooser.APPROVE_OPTION) {
-            String selectedFile = fileChooser.getSelectedFile().getPath()+".png";
+            String selectedFile = fileChooser.getSelectedFile().getPath() + ".png";
             try (OutputStream out = new FileOutputStream(selectedFile)) {
                 ImageIO.write(controller.getImageC(), "png", out);
                 saved = true;
@@ -312,7 +309,7 @@ public class InitMainWindow extends MainFrame {
                 controller,
                 FilterType.GAMMA,
                 0,
-                2,
+                5,
                 1);
     }
 

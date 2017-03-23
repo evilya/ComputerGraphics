@@ -38,13 +38,13 @@ public class ImageZone extends JPanel {
         return new Dimension(350, 350);
     }
 
+    public BufferedImage getImage() {
+        return image;
+    }
+
     public void setImage(BufferedImage image) {
         this.image = image;
         repaint();
-    }
-
-    public BufferedImage getImage() {
-        return image;
     }
 
     public void setChosen(int x, int y, int sizeW, int sizeH) {
