@@ -1,16 +1,14 @@
 package ru.nsu.fit.g14203.evtushenko.view;
 
-import ru.nsu.fit.g14203.evtushenko.Controller;
 import ru.nsu.fit.g14203.evtushenko.model.Model;
 import ru.nsu.fit.g14203.evtushenko.utils.ExtensionFileFilter;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.KeyEvent;
 
 public class InitMainWindow extends MainFrame {
-    private Controller controller;
-    private View view;
+    private final View view;
+    private final Model model;
 
     public InitMainWindow() {
         super(1120, 620, "Filter");
@@ -18,17 +16,11 @@ public class InitMainWindow extends MainFrame {
             initMenu();
             initToolbar();
 
-            Model model = new Model();
-            controller = new Controller(model, this);
-            view = new View(controller);
+            model = new Model();
+            view = new View(model);
             model.addObserver(view);
 
-            JPanel flowPane = new JPanel(new FlowLayout(FlowLayout.LEFT));
-            JScrollPane scrollPane = new JScrollPane(flowPane);
-
-            flowPane.setPreferredSize(new Dimension(1100, 370));
-            flowPane.add(view);
-            add(scrollPane);
+            add(view);
 
         } catch (Exception e) {
             throw new RuntimeException(e);
