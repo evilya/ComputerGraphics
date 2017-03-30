@@ -5,6 +5,10 @@ public class MathUtils {
         return Math.min(Math.max(value, min), max);
     }
 
+    public static double constraint(double value, double min, double max) {
+        return Math.min(Math.max(value, min), max);
+    }
+
     public static int constraint(int value) {
         return Math.min(Math.max(value, 0), 255);
     }

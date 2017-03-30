@@ -1,6 +1,5 @@
 package ru.nsu.fit.g14203.evtushenko.view;
 
-import ru.nsu.fit.g14203.evtushenko.model.Model;
 import ru.nsu.fit.g14203.evtushenko.utils.ExtensionFileFilter;
 
 import javax.swing.*;
@@ -8,17 +7,17 @@ import java.awt.event.KeyEvent;
 
 public class InitMainWindow extends MainFrame {
     private final View view;
-    private final Model model;
+
+    private JToggleButton interpolationToggle;
+    private JRadioButtonMenuItem interpolationItem;
 
     public InitMainWindow() {
-        super(1120, 620, "Filter");
+        super(1120, 620, "Isolines");
         try {
             initMenu();
             initToolbar();
-
-            model = new Model();
-            view = new View(model);
-            model.addObserver(view);
+            connectToggles();
+            view = new View();
 
             add(view);
 
@@ -38,6 +37,8 @@ public class InitMainWindow extends MainFrame {
         addToolBarButton("File/Save");
         addToolBarButton("File/Save as");
         addToolBarSeparator();
+        interpolationToggle = addToolBarToggleButton("View/Interpolation");
+        addToolBarSeparator();
         addToolBarButton("Help/About");
         addToolBarButton("File/Exit");
     }
@@ -50,8 +51,16 @@ public class InitMainWindow extends MainFrame {
         addMenuSeparator("File");
         addMenuItem("File/Exit", "Exit", KeyEvent.VK_X, "exit.png", "onExit");
 
+        addSubMenu("View", KeyEvent.VK_V);
+        interpolationItem = (JRadioButtonMenuItem) addRadioMenuItem("View/Interpolation", "Enable interpolation", 0, "xor.png", "onInterpolation");
+
         addSubMenu("Help", KeyEvent.VK_H);
         addMenuItem("Help/About", "Show program version and copyright information", KeyEvent.VK_A, "about.png", "onAbout");
+    }
+
+    private void connectToggles() {
+        interpolationItem.addActionListener(e -> interpolationToggle.setSelected(interpolationItem.isSelected()));
+        interpolationToggle.addActionListener(e -> interpolationItem.setSelected(interpolationToggle.isSelected()));
     }
 
     public void onAbout() {
@@ -82,5 +91,8 @@ public class InitMainWindow extends MainFrame {
 
     }
 
+    public void onInterpolation() {
+        view.setInterpolation(interpolationItem.isSelected());
+    }
 
 }
