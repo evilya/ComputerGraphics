@@ -75,11 +75,11 @@ public class InitMainWindow extends MainFrame {
         addMenuItem("File/Exit", "Exit", KeyEvent.VK_X, "exit.png", "onExit");
 
         addSubMenu("View", KeyEvent.VK_V);
-        addRadioMenuItem("View/Settings", "Settings", 0, "xor.png", "onSettings");
-        interpolationItem = (JRadioButtonMenuItem) addRadioMenuItem("View/Interpolation", "Enable interpolation", 0, "xor.png", "onInterpolation");
-        isolinesItem = (JRadioButtonMenuItem) addRadioMenuItem("View/Isolines", "Enable isolines", 0, "xor.png", "onIsolines");
+        addRadioMenuItem("View/Settings", "Settings", 0, "settings.png", "onSettings");
+        interpolationItem = (JRadioButtonMenuItem) addRadioMenuItem("View/Interpolation", "Enable interpolation", 0, "impacts.png", "onInterpolation");
+        isolinesItem = (JRadioButtonMenuItem) addRadioMenuItem("View/Isolines", "Enable isolines", 0, "left.png", "onIsolines");
         gridItem = (JRadioButtonMenuItem) addRadioMenuItem("View/Grid", "Enable grid", 0, "xor.png", "onGrid");
-        pointsItem = (JRadioButtonMenuItem) addRadioMenuItem("View/Points", "Enable points", 0, "xor.png", "onPoints");
+        pointsItem = (JRadioButtonMenuItem) addRadioMenuItem("View/Points", "Enable points", 0, "replace.png", "onPoints");
 
         addSubMenu("Help", KeyEvent.VK_H);
         addMenuItem("Help/About", "Show program version and copyright information", KeyEvent.VK_A, "about.png", "onAbout");
