@@ -21,7 +21,12 @@ public class FileLoader {
                 int b = Integer.parseInt(numbers[2]);
                 colors[i] = new Color(r, g, b);
             }
-            return new Config(k, m, colors);
+            numbers = readNextNumbers(scanner, 3);
+            int r = Integer.parseInt(numbers[0]);
+            int g = Integer.parseInt(numbers[1]);
+            int b = Integer.parseInt(numbers[2]);
+            Color borderColor = new Color(r,g,b);
+            return new Config(k, m, colors, borderColor);
         } catch (FileNotFoundException e) {
             throw new IllegalArgumentException();
         }

@@ -6,11 +6,13 @@ public class Config {
     private int k;
     private int m;
     private Color[] colors;
+    private Color borderColor;
 
-    public Config(int k, int m, Color[] colors) {
+    public Config(int k, int m, Color[] colors, Color borderColor) {
         this.k = k;
         this.m = m;
         this.colors = colors;
+        this.borderColor = borderColor;
     }
 
     public int getK() {
@@ -23,5 +25,9 @@ public class Config {
 
     public Color[] getColors() {
         return colors;
+    }
+
+    public Color getBorderColor() {
+        return borderColor;
     }
 }

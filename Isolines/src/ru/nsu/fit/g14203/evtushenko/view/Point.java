@@ -16,4 +16,10 @@ public class Point {
     public double getY() {
         return y;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        Point point = (Point) obj;
+        return x == point.x && y == point.y;
+    }
 }

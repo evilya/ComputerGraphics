@@ -1,23 +1,42 @@
 package ru.nsu.fit.g14203.evtushenko.view;
 
+import ru.nsu.fit.g14203.evtushenko.model.Config;
+import ru.nsu.fit.g14203.evtushenko.model.FileLoader;
 import ru.nsu.fit.g14203.evtushenko.utils.ExtensionFileFilter;
 
 import javax.swing.*;
+import javax.swing.border.BevelBorder;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 
 public class InitMainWindow extends MainFrame {
     private final View view;
 
     private JToggleButton interpolationToggle;
+    private JToggleButton isolinesToggle;
+    private JToggleButton gridToggle;
+    private JToggleButton pointsToggle;
     private JRadioButtonMenuItem interpolationItem;
+    private JRadioButtonMenuItem isolinesItem;
+    private JRadioButtonMenuItem gridItem;
+    private JRadioButtonMenuItem pointsItem;
 
     public InitMainWindow() {
         super(1120, 620, "Isolines");
         try {
+            setLayout(new BorderLayout());
+            JPanel statusPanel = new JPanel();
+            statusPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
+            add(statusPanel, BorderLayout.SOUTH);
+            statusPanel.setPreferredSize(new Dimension(getWidth(), 16));
+            statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.X_AXIS));
+            JLabel statusLabel = new JLabel("");
+            statusLabel.setHorizontalAlignment(SwingConstants.LEFT);
+            statusPanel.add(statusLabel);
             initMenu();
             initToolbar();
             connectToggles();
-            view = new View();
+            view = new View(statusLabel);
 
             add(view);
 
@@ -33,11 +52,17 @@ public class InitMainWindow extends MainFrame {
     }
 
     private void initToolbar() throws NoSuchMethodException {
+        toolBar = new JToolBar("Main toolbar");
+        toolBar.setRollover(true);
+        toolBar.setFloatable(false);
+        add(toolBar, BorderLayout.NORTH);
         addToolBarButton("File/Open");
-        addToolBarButton("File/Save");
-        addToolBarButton("File/Save as");
         addToolBarSeparator();
+        addToolBarButton("View/Settings");
         interpolationToggle = addToolBarToggleButton("View/Interpolation");
+        isolinesToggle = addToolBarToggleButton("View/Isolines");
+        gridToggle = addToolBarToggleButton("View/Grid");
+        pointsToggle = addToolBarToggleButton("View/Points");
         addToolBarSeparator();
         addToolBarButton("Help/About");
         addToolBarButton("File/Exit");
@@ -46,13 +71,15 @@ public class InitMainWindow extends MainFrame {
     private void initMenu() throws NoSuchMethodException {
         addSubMenu("File", KeyEvent.VK_F);
         addMenuItem("File/Open", "Open", KeyEvent.VK_O, "open.png", "onOpen");
-        addMenuItem("File/Save", "Save", KeyEvent.VK_S, "save.png", "onSave");
-        addMenuItem("File/Save as", "Save as", 0, "saveas.png", "onSaveAs");
         addMenuSeparator("File");
         addMenuItem("File/Exit", "Exit", KeyEvent.VK_X, "exit.png", "onExit");
 
         addSubMenu("View", KeyEvent.VK_V);
+        addRadioMenuItem("View/Settings", "Settings", 0, "xor.png", "onSettings");
         interpolationItem = (JRadioButtonMenuItem) addRadioMenuItem("View/Interpolation", "Enable interpolation", 0, "xor.png", "onInterpolation");
+        isolinesItem = (JRadioButtonMenuItem) addRadioMenuItem("View/Isolines", "Enable isolines", 0, "xor.png", "onIsolines");
+        gridItem = (JRadioButtonMenuItem) addRadioMenuItem("View/Grid", "Enable grid", 0, "xor.png", "onGrid");
+        pointsItem = (JRadioButtonMenuItem) addRadioMenuItem("View/Points", "Enable points", 0, "xor.png", "onPoints");
 
         addSubMenu("Help", KeyEvent.VK_H);
         addMenuItem("Help/About", "Show program version and copyright information", KeyEvent.VK_A, "about.png", "onAbout");
@@ -61,6 +88,15 @@ public class InitMainWindow extends MainFrame {
     private void connectToggles() {
         interpolationItem.addActionListener(e -> interpolationToggle.setSelected(interpolationItem.isSelected()));
         interpolationToggle.addActionListener(e -> interpolationItem.setSelected(interpolationToggle.isSelected()));
+
+        isolinesItem.addActionListener(e -> isolinesToggle.setSelected(isolinesItem.isSelected()));
+        isolinesToggle.addActionListener(e -> isolinesItem.setSelected(isolinesToggle.isSelected()));
+
+        gridItem.addActionListener(e -> gridToggle.setSelected(gridItem.isSelected()));
+        gridToggle.addActionListener(e -> gridItem.setSelected(gridToggle.isSelected()));
+
+        pointsItem.addActionListener(e -> pointsToggle.setSelected(pointsItem.isSelected()));
+        pointsToggle.addActionListener(e -> pointsItem.setSelected(pointsToggle.isSelected()));
     }
 
     public void onAbout() {
@@ -74,25 +110,43 @@ public class InitMainWindow extends MainFrame {
     }
 
     public void onOpen() {
-        JFileChooser fileChooser = new JFileChooser("FIT_14203_Evtushenko_Ilya_Filter_Data");
+        JFileChooser fileChooser = new JFileChooser("FIT_14203_Evtushenko_Ilya_Isolines_Data");
         fileChooser.addChoosableFileFilter(new ExtensionFileFilter("png", "PNG24"));
         fileChooser.addChoosableFileFilter(new ExtensionFileFilter("bmp", "BMP24"));
         int res = fileChooser.showDialog(this, "Open");
         if (res == JFileChooser.APPROVE_OPTION) {
-
+            try {
+                Config config =
+                        FileLoader.readConfig(fileChooser.getSelectedFile().getAbsolutePath());
+                view.setConfig(config);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this,
+                        "Can not open this file",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 
-    public void onSave() {
-
-    }
-
-    public void onSaveAs() {
-
-    }
 
     public void onInterpolation() {
         view.setInterpolation(interpolationItem.isSelected());
+    }
+
+    public void onIsolines() {
+        view.setIsolines(isolinesItem.isSelected());
+    }
+
+    public void onPoints() {
+        view.setPoints(pointsItem.isSelected());
+    }
+
+    public void onGrid() {
+        view.setGrid(gridItem.isSelected());
+    }
+
+    public void onSettings() {
+        new SettingsDialog(this, view);
     }
 
 }

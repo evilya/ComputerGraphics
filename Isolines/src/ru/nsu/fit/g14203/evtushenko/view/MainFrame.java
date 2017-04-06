@@ -23,10 +23,10 @@ public class MainFrame extends JFrame {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         menuBar = new JMenuBar();
         setJMenuBar(menuBar);
-        toolBar = new JToolBar("Main toolbar");
-        toolBar.setRollover(true);
-        toolBar.setFloatable(false);
-        add(toolBar, BorderLayout.PAGE_START);
+//        toolBar = new JToolBar("Main toolbar");
+//        toolBar.setRollover(true);
+//        toolBar.setFloatable(false);
+//        add(toolBar, BorderLayout.NORTH);
     }
 
     public MainFrame(int x, int y, String title) {
