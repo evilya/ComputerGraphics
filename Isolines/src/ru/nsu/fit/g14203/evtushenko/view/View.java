@@ -26,14 +26,11 @@ public class View extends JPanel {
     private final JLabel statusLabel;
     private Color borderColor;
     private List<String> labels;
-    //    private BiFunction<Double, Double, Double> function =
-//            (x, y) -> x * x * Math.sin(x) - y * y * Math.cos(y);
     private BiFunction<Double, Double, Double> function =
-            (x, y) -> {
-//                return x * x - y * y;
-                return Math.cos(x) + Math.sin(y);
+            (x, y) -> x * x + y * y;
+//    private BiFunction<Double, Double, Double> function =
 //                return Math.sqrt((x * x) + (y * y)) * Math.sin(Math.sqrt((x * x) + (y * y)));
-            };
+//            };
 
     private double[][] nodes;
     private double fMin = Double.MAX_VALUE;
@@ -87,7 +84,7 @@ public class View extends JPanel {
                     double x = (double) xGrowth * e.getX() / getPlotWidth() + c;
                     double y = (double) yGrowth * e.getY() / getPlotHeight() + a;
                     double value = function.apply(x, y);
-//                    System.out.println(x + " " + y + " " + value);
+                    View.this.statusLabel.setText(String.format("x=%.2f, y=%.2f, f(x,y)=%.4f", x, y, value));
                     extraIsolinePoints.clear();
                     extraIsolinePoints.add(buildIsoline(value, nodes));
                     repaint();
@@ -203,8 +200,8 @@ public class View extends JPanel {
                     int x2 = (int) (getPlotWidth() * (to.getX() - a) / xGrowth + 0.5);
                     int y1 = (int) (getPlotHeight() * (from.getY() - c) / yGrowth + 0.5);
                     int y2 = (int) (getPlotHeight() * (to.getY() - c) / yGrowth + 0.5);
-                    g.drawOval(x1-1, y1-1, 2, 2);
-                    g.drawOval(x2-1, y2-1, 2, 2);
+                    g.drawOval(x1 - 1, y1 - 1, 2, 2);
+                    g.drawOval(x2 - 1, y2 - 1, 2, 2);
                 }
             }
         }
@@ -221,7 +218,7 @@ public class View extends JPanel {
             }
             for (int i = 1; i < k - 1; i++) {
                 int x1 = (int) (getPlotWidth() * (dx * i) / xGrowth + 0.5);
-                g.drawLine(x1, 0, x1, getPlotHeight()-1);
+                g.drawLine(x1, 0, x1, getPlotHeight() - 1);
             }
         }
     }
