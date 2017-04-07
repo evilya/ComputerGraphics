@@ -27,7 +27,7 @@ public class View extends JPanel {
     private Color borderColor;
     private List<String> labels;
     private BiFunction<Double, Double, Double> function =
-            (x, y) -> x * x + y * y;
+            (x, y) -> x * x - y * y;
 //    private BiFunction<Double, Double, Double> function =
 //                return Math.sqrt((x * x) + (y * y)) * Math.sin(Math.sqrt((x * x) + (y * y)));
 //            };
@@ -40,7 +40,7 @@ public class View extends JPanel {
     private List<List<Point>> basicIsolinePoints;
     private List<List<Point>> extraIsolinePoints;
     private BufferedImage image;
-    private boolean interpolation, grid, isolines, loaded, points;
+    private boolean interpolation, grid, isolines, loaded, points, map;
     private int a, b, c, d;
     private int xGrowth, yGrowth;
     private int m, k;
@@ -169,6 +169,11 @@ public class View extends JPanel {
 
     public void setPoints(boolean points) {
         this.points = points;
+        repaint();
+    }
+
+    public void setMap(boolean map) {
+        this.map = map;
         repaint();
     }
 
@@ -335,20 +340,24 @@ public class View extends JPanel {
                 for (int u = 0; u < getPlotWidth(); u++) {
                     double x = (double) xGrowth * u / getPlotWidth() + a;
                     double value = function.apply(x, y);
-                    if (interpolation) {
-                        int rgb = image.getRGB(
-                                (int) constraint(
-                                        (getPlotWidth() - 2 * getLegendOffsetX())
-                                                * (value - fMin) / (fMax - fMin)
-                                                + getLegendOffsetX(),
-                                        0,
-                                        getPlotWidth() - 1 - getLegendOffsetX()),
-                                getPlotHeight() + getLegendOffsetY());
-                        image.setRGB(u, v, rgb);
+                    if (map) {
+                        if (interpolation) {
+                            int rgb = image.getRGB(
+                                    (int) constraint(
+                                            (getPlotWidth() - 2 * getLegendOffsetX())
+                                                    * (value - fMin) / (fMax - fMin)
+                                                    + getLegendOffsetX(),
+                                            0,
+                                            getPlotWidth() - 1 - getLegendOffsetX()),
+                                    getPlotHeight() + getLegendOffsetY());
+                            image.setRGB(u, v, rgb);
+                        } else {
+                            double colorValue = (value - fMin) * colors.length / (fMax - fMin);
+                            int colorIndex = (int) constraint(colorValue, 0, colors.length - 1);
+                            image.setRGB(u, v, colors[colorIndex].getRGB());
+                        }
                     } else {
-                        double colorValue = (value - fMin) * colors.length / (fMax - fMin);
-                        int colorIndex = (int) constraint(colorValue, 0, colors.length - 1);
-                        image.setRGB(u, v, colors[colorIndex].getRGB());
+                        image.setRGB(u, v, Color.WHITE.getRGB());
                     }
                 }
             }

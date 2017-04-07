@@ -16,10 +16,12 @@ public class InitMainWindow extends MainFrame {
     private JToggleButton isolinesToggle;
     private JToggleButton gridToggle;
     private JToggleButton pointsToggle;
+    private JToggleButton mapToggle;
     private JRadioButtonMenuItem interpolationItem;
     private JRadioButtonMenuItem isolinesItem;
     private JRadioButtonMenuItem gridItem;
     private JRadioButtonMenuItem pointsItem;
+    private JRadioButtonMenuItem mapItem;
 
     public InitMainWindow() {
         super(1120, 620, "Isolines");
@@ -63,6 +65,7 @@ public class InitMainWindow extends MainFrame {
         isolinesToggle = addToolBarToggleButton("View/Isolines");
         gridToggle = addToolBarToggleButton("View/Grid");
         pointsToggle = addToolBarToggleButton("View/Points");
+        mapToggle = addToolBarToggleButton("View/Map");
         addToolBarSeparator();
         addToolBarButton("Help/About");
         addToolBarButton("File/Exit");
@@ -80,6 +83,7 @@ public class InitMainWindow extends MainFrame {
         isolinesItem = (JRadioButtonMenuItem) addRadioMenuItem("View/Isolines", "Enable isolines", 0, "left.png", "onIsolines");
         gridItem = (JRadioButtonMenuItem) addRadioMenuItem("View/Grid", "Enable grid", 0, "xor.png", "onGrid");
         pointsItem = (JRadioButtonMenuItem) addRadioMenuItem("View/Points", "Enable points", 0, "replace.png", "onPoints");
+        mapItem = (JRadioButtonMenuItem) addRadioMenuItem("View/Map", "Enable map", 0, "select.png", "onMap");
 
         addSubMenu("Help", KeyEvent.VK_H);
         addMenuItem("Help/About", "Show program version and copyright information", KeyEvent.VK_A, "about.png", "onAbout");
@@ -97,6 +101,9 @@ public class InitMainWindow extends MainFrame {
 
         pointsItem.addActionListener(e -> pointsToggle.setSelected(pointsItem.isSelected()));
         pointsToggle.addActionListener(e -> pointsItem.setSelected(pointsToggle.isSelected()));
+
+        mapItem.addActionListener(e -> mapToggle.setSelected(mapItem.isSelected()));
+        mapToggle.addActionListener(e -> mapItem.setSelected(mapToggle.isSelected()));
     }
 
     public void onAbout() {
@@ -147,6 +154,10 @@ public class InitMainWindow extends MainFrame {
 
     public void onSettings() {
         new SettingsDialog(this, view);
+    }
+
+    public void onMap(){
+        view.setMap(mapItem.isSelected());
     }
 
 }
