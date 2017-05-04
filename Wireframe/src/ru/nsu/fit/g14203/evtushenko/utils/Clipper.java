@@ -44,67 +44,67 @@ public class Clipper {
         return a;
     }
 
-    public Line<Point3D> getClippedLine(Point3D startPoint, Point3D endPoint) {
-        double x0 = startPoint.getX();
-        double x1 = endPoint.getX();
-        double y0 = startPoint.getY();
-        double y1 = endPoint.getY();
-        double z0 = startPoint.getZ();
-        double z1 = endPoint.getZ();
+    public Line<Point3D> getClippedLine(Point3D start, Point3D end) {
+        double x0 = start.getX();
+        double x1 = end.getX();
+        double y0 = start.getY();
+        double y1 = end.getY();
+        double z0 = start.getZ();
+        double z1 = end.getZ();
 
-        BitSet startOutCode = getOutCode(startPoint);
-        BitSet endOutCode = getOutCode(endPoint);
+        BitSet startBitSet = getOutCode(start);
+        BitSet endBitSet = getOutCode(end);
 
-        boolean accept = false;
+        boolean inBox = false;
 
         while (true) {
-            if (startOutCode.isEmpty() && endOutCode.isEmpty()) {
-                accept = true;
+            if (startBitSet.isEmpty() && endBitSet.isEmpty()) {
+                inBox = true;
                 break;
             } else {
-                if (startOutCode.intersects(endOutCode)) {
+                if (startBitSet.intersects(endBitSet)) {
                     break;
                 } else {
                     double x = 0;
                     double y = 0;
                     double z = 0;
 
-                    BitSet outCode = !startOutCode.isEmpty() ? startOutCode : endOutCode;
+                    BitSet bitset = !startBitSet.isEmpty() ? startBitSet : endBitSet;
 
-                    if (outCode.get(3)) {
+                    if (bitset.get(3)) {
                         x = x0 + (x1 - x0) * (yMax - y0) /
                                 (y1 - y0);
                         y = yMax;
                         z = z0 + (z1 - z0) * (yMax - y0) /
                                 (y1 - y0);
-                    } else if (outCode.get(2)) {
+                    } else if (bitset.get(2)) {
                         x = x0 + (x1 - x0) * (yMin - y0) /
                                 (y1 - y0);
                         y = yMin;
                         z = z0 + (z1 - z0) * (yMin - y0) /
                                 (y1 - y0);
-                    } else if (outCode.get(1)) {
+                    } else if (bitset.get(1)) {
                         y = y0 + (y1 - y0) * (xMax - x0) /
                                 (x1 - x0);
                         x = xMax;
                         z = z0 + (z1 - z0) * (xMax - x0) /
                                 (x1 - x0);
 
-                    } else if (outCode.get(0)) {
+                    } else if (bitset.get(0)) {
                         y = y0 + (y1 - y0) * (xMin - x0) /
                                 (x1 - x0);
                         x = xMin;
                         z = z0 + (z1 - z0) * (xMin - x0) /
                                 (x1 - x0);
 
-                    } else if (outCode.get(5)) {
+                    } else if (bitset.get(5)) {
                         x = x0 + (x1 - x0) * (zMax - z0) /
                                 (z1 - z0);
 
                         y = y0 + (y1 - y0) * (zMax - z0) /
                                 (z1 - z0);
                         z = zMax;
-                    } else if (outCode.get(4)) {
+                    } else if (bitset.get(4)) {
                         x = x0 + (x1 - x0) * (zMin - z0) /
                                 (z1 - z0);
 
@@ -113,23 +113,24 @@ public class Clipper {
                         z = zMin;
                     }
 
-                    if (outCode == startOutCode) {
+                    if (bitset.equals(startBitSet)) {
                         x0 = x;
                         y0 = y;
                         z0 = z;
-                        startOutCode = getOutCode(new Point3D(x0, y0, z0));
+                        startBitSet = getOutCode(new Point3D(x0, y0, z0));
                     } else {
                         x1 = x;
                         y1 = y;
                         z1 = z;
-                        endOutCode = getOutCode(new Point3D(x1, y1, z1));
+                        endBitSet = getOutCode(new Point3D(x1, y1, z1));
                     }
                 }
             }
         }
 
-        if (accept) {
-            return new Line<>(new Point3D(x0, y0, z0), new Point3D(x1, y1, z1));
+        if (inBox) {
+            return new Line<>(new Point3D(x0, y0, z0),
+                    new Point3D(x1, y1, z1));
         } else {
             return null;
         }
