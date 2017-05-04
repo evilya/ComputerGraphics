@@ -15,6 +15,7 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class View extends JPanel implements Observer {
     private Model model;
@@ -28,8 +29,8 @@ public class View extends JPanel implements Observer {
             public void mouseDragged(MouseEvent e) {
                 c.deltaX = c.startX - e.getX();
                 c.deltaY = c.startY - e.getY();
-                double angleX = 2. * Math.PI * c.deltaX / 400;
-                double angleY = 2. * Math.PI * c.deltaY / 400;
+                double angleX = 2. * Math.PI * c.deltaX / 800;
+                double angleY = 2. * Math.PI * c.deltaY / 800;
                 model.rotate(angleX, angleY);
                 c.startX = e.getX();
                 c.startY = e.getY();
@@ -46,7 +47,8 @@ public class View extends JPanel implements Observer {
             int sum = 1;
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
-                sum = MathUtils.constraint(sum + e.getWheelRotation(), 1, 100);
+                sum += e.getWheelRotation();
+                System.out.println(sum);
                 model.zoom(sum);
             }
         });
@@ -63,6 +65,7 @@ public class View extends JPanel implements Observer {
                         ((Graphics2D) g).setStroke(new BasicStroke(s.getWidth()));
                         return s.getLines().stream();
                     })
+                    .filter(Objects::nonNull)
                     .forEach(l -> {
                         Color prev = null;
                         Color color = l.getColor();
@@ -71,10 +74,10 @@ public class View extends JPanel implements Observer {
                             g.setColor(color);
                         }
                         int panelSize = Math.min(getWidth(), getHeight());
-                        int x1 = (int) (panelSize * l.getStart().getX() + 0.5);
-                        int y1 = (int) (panelSize * l.getStart().getY() + 0.5);
-                        int x2 = (int) (panelSize * l.getEnd().getX() + 0.5);
-                        int y2 = (int) (panelSize * l.getEnd().getY() + 0.5);
+                        int x1 = (int) (panelSize * (l.getStart().getX() + 0.5));
+                        int y1 = (int) (panelSize * (l.getStart().getY() + 0.5));
+                        int x2 = (int) (panelSize * (l.getEnd().getX() + 0.5));
+                        int y2 = (int) (panelSize * (l.getEnd().getY() + 0.5));
                         g.drawLine(x1, y1, x2, y2);
                         if (color != null) {
                             g.setColor(prev);

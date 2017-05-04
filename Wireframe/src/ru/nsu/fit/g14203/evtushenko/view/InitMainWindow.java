@@ -8,6 +8,9 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 
 public class InitMainWindow extends MainFrame {
+
+    private final Model model;
+
     public InitMainWindow() {
         super(1120, 620, "Isolines");
         try {
@@ -23,7 +26,7 @@ public class InitMainWindow extends MainFrame {
             initMenu();
             initToolbar();
             connectToggles();
-            Model model = new Model();
+            model = new Model();
             Thread modelThread = new Thread(model);
             View view = new View(model);
             model.addObserver(view);
@@ -48,6 +51,7 @@ public class InitMainWindow extends MainFrame {
         toolBar.setFloatable(false);
         add(toolBar, BorderLayout.NORTH);
         addToolBarButton("File/Open");
+        addToolBarButton("File/Settings");
         addToolBarSeparator();
         addToolBarButton("Help/About");
         addToolBarButton("File/Exit");
@@ -56,6 +60,7 @@ public class InitMainWindow extends MainFrame {
     private void initMenu() throws NoSuchMethodException {
         addSubMenu("File", KeyEvent.VK_F);
         addMenuItem("File/Open", "Open", KeyEvent.VK_O, "open.png", "onOpen");
+        addMenuItem("File/Settings", "Settings", KeyEvent.VK_O, "settings.png", "onSettings");
         addMenuSeparator("File");
         addMenuItem("File/Exit", "Exit", KeyEvent.VK_X, "exit.png", "onExit");
 
@@ -78,6 +83,13 @@ public class InitMainWindow extends MainFrame {
 
     public void onOpen() {
 
+    }
+
+    public void onSettings(){
+        JDialog dialog = new JDialog();
+        dialog.setSize(600,600);
+        dialog.add(new SplinePanel(model));
+        dialog.setVisible(true);
     }
 
 }
