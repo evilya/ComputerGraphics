@@ -86,10 +86,10 @@ public class InitMainWindow extends MainFrame {
     }
 
     public void onSettings(){
-        JDialog dialog = new JDialog();
-        dialog.setSize(600,600);
-        dialog.add(new SplinePanel(model));
-        dialog.setVisible(true);
+//        JDialog dialog = new JDialog();
+//        dialog.setSize(600,600);
+//        dialog.add(new SplinePanel(model));
+//        dialog.setVisible(true);
     }
 
 }
