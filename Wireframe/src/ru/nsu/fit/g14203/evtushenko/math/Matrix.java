@@ -1,4 +1,4 @@
-package ru.nsu.fit.g14203.evtushenko.model;
+package ru.nsu.fit.g14203.evtushenko.math;
 
 public class Matrix {
     private final double[][] matrix;
@@ -11,17 +11,17 @@ public class Matrix {
         width = matrix[0].length;
     }
 
-    public Matrix multiply(double mult) {
+    public Matrix multiply(double multiplier) {
         double[][] result = new double[height][width];
         for (int j = 0; j < height; j++) {
             for (int i = 0; i < height; i++) {
-                result[j][i] = matrix[j][i] * mult;
+                result[j][i] = matrix[j][i] * multiplier;
             }
         }
         return new Matrix(result);
     }
 
-    public Matrix multiplyRight(Matrix other) {
+    public Matrix multiply(Matrix other) {
         int m = matrix.length;
         int n = other.matrix[0].length;
         int o = other.matrix.length;

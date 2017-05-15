@@ -1,7 +1,7 @@
-package ru.nsu.fit.g14203.evtushenko.utils;
+package ru.nsu.fit.g14203.evtushenko.model;
 
-import ru.nsu.fit.g14203.evtushenko.model.Line;
-import ru.nsu.fit.g14203.evtushenko.model.Point3D;
+import ru.nsu.fit.g14203.evtushenko.model.geom.Line;
+import ru.nsu.fit.g14203.evtushenko.model.geom.Point3D;
 
 import java.util.BitSet;
 
@@ -22,7 +22,7 @@ public class Clipper {
         this.zMax = zMax;
     }
 
-    private BitSet getOutCode(Point3D point3D) {
+    private BitSet getBits(Point3D point3D) {
         BitSet a = new BitSet(6);
         if (point3D.getX() < xMin) {
             a.set(0);
@@ -52,8 +52,8 @@ public class Clipper {
         double z0 = start.getZ();
         double z1 = end.getZ();
 
-        BitSet startBitSet = getOutCode(start);
-        BitSet endBitSet = getOutCode(end);
+        BitSet startBitSet = getBits(start);
+        BitSet endBitSet = getBits(end);
 
         boolean inBox = false;
 
@@ -117,12 +117,12 @@ public class Clipper {
                         x0 = x;
                         y0 = y;
                         z0 = z;
-                        startBitSet = getOutCode(new Point3D(x0, y0, z0));
+                        startBitSet = getBits(new Point3D(x0, y0, z0));
                     } else {
                         x1 = x;
                         y1 = y;
                         z1 = z;
-                        endBitSet = getOutCode(new Point3D(x1, y1, z1));
+                        endBitSet = getBits(new Point3D(x1, y1, z1));
                     }
                 }
             }

@@ -3,9 +3,7 @@ package ru.nsu.fit.g14203.evtushenko.view;
 import ru.nsu.fit.g14203.evtushenko.EventType;
 import ru.nsu.fit.g14203.evtushenko.Observer;
 import ru.nsu.fit.g14203.evtushenko.model.Model;
-import ru.nsu.fit.g14203.evtushenko.model.Point2D;
-import ru.nsu.fit.g14203.evtushenko.model.Shape;
-import ru.nsu.fit.g14203.evtushenko.utils.MathUtils;
+import ru.nsu.fit.g14203.evtushenko.model.geom.Shape2D;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,13 +11,15 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseWheelEvent;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class View extends JPanel implements Observer {
+    private final int SIZE = 600;
     private Model model;
-    private List<Shape<Point2D>> shapes;
+    private List<Shape2D> shapes;
 
     public View(Model model) {
         this.model = model;
@@ -29,8 +29,8 @@ public class View extends JPanel implements Observer {
             public void mouseDragged(MouseEvent e) {
                 c.deltaX = c.startX - e.getX();
                 c.deltaY = c.startY - e.getY();
-                double angleX = 2. * Math.PI * c.deltaX / 800;
-                double angleY = 2. * Math.PI * c.deltaY / 800;
+                double angleX = 2. * Math.PI * c.deltaX / 400;
+                double angleY = 2. * Math.PI * c.deltaY / 400;
                 model.rotate(angleX, angleY);
                 c.startX = e.getX();
                 c.startY = e.getY();
@@ -45,11 +45,12 @@ public class View extends JPanel implements Observer {
         });
         addMouseWheelListener(new MouseAdapter() {
             int sum = 1;
+
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
                 sum += e.getWheelRotation();
-                System.out.println(sum);
                 model.zoom(sum);
+
             }
         });
         model.update();
@@ -59,31 +60,46 @@ public class View extends JPanel implements Observer {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         if (shapes != null) {
+            int width = (int) (SIZE * model.getPovConverter().getsW());
+            int height = (int) (SIZE * model.getPovConverter().getsH());
+            BufferedImage image = new BufferedImage(width,
+                    height,
+                    BufferedImage.TYPE_INT_ARGB);
+            Graphics2D graphics = image.createGraphics();
+            graphics.setColor(Color.WHITE);
+            graphics.fillRect(0, 0, width, height);
             shapes.stream()
                     .flatMap(s -> {
-                        g.setColor(s.getColor());
-                        ((Graphics2D) g).setStroke(new BasicStroke(s.getWidth()));
+                        graphics.setColor(s.getColor());
+                        graphics.setStroke(new BasicStroke(s.getWidth()));
                         return s.getLines().stream();
                     })
                     .filter(Objects::nonNull)
                     .forEach(l -> {
                         Color prev = null;
                         Color color = l.getColor();
-                        if (color != null){
-                            prev = g.getColor();
-                            g.setColor(color);
-                        }
-                        int panelSize = Math.min(getWidth(), getHeight());
-                        int x1 = (int) (panelSize * (l.getStart().getX() + 0.5));
-                        int y1 = (int) (panelSize * (l.getStart().getY() + 0.5));
-                        int x2 = (int) (panelSize * (l.getEnd().getX() + 0.5));
-                        int y2 = (int) (panelSize * (l.getEnd().getY() + 0.5));
-                        g.drawLine(x1, y1, x2, y2);
                         if (color != null) {
-                            g.setColor(prev);
+                            prev = graphics.getColor();
+                            graphics.setColor(color);
+                        }
+                        int x1 = (int) (width * (l.getStart().getX() + 0.5));
+                        int y1 = (int) (height * (l.getStart().getY() + 0.5));
+                        int x2 = (int) (width * (l.getEnd().getX() + 0.5));
+                        int y2 = (int) (height * (l.getEnd().getY() + 0.5));
+                        graphics.drawLine(x1, y1, x2, y2);
+                        if (color != null) {
+                            graphics.setColor(prev);
                         }
                     });
+            g.drawImage(image, 10, 10, null);
         }
+
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        return new Dimension((int) (SIZE * model.getPovConverter().getsW() + 10),
+                (int) (SIZE * model.getPovConverter().getsH() + 10));
     }
 
     @Override
@@ -95,6 +111,7 @@ public class View extends JPanel implements Observer {
             case READY:
                 shapes = new ArrayList<>(model.getResultShapes());
                 SwingUtilities.invokeLater(this::repaint);
+                SwingUtilities.invokeLater(() -> getParent().revalidate());
                 break;
             default:
         }

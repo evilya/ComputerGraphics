@@ -1,4 +1,4 @@
-package ru.nsu.fit.g14203.evtushenko.model;
+package ru.nsu.fit.g14203.evtushenko.model.geom;
 
 import java.awt.*;
 

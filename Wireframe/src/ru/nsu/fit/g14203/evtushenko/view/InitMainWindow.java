@@ -3,7 +3,6 @@ package ru.nsu.fit.g14203.evtushenko.view;
 import ru.nsu.fit.g14203.evtushenko.model.Model;
 
 import javax.swing.*;
-import javax.swing.border.BevelBorder;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
@@ -12,28 +11,21 @@ public class InitMainWindow extends MainFrame {
     private final Model model;
 
     public InitMainWindow() {
-        super(1120, 620, "Isolines");
+        super(800, 800, "Wireframe");
         try {
-            setLayout(new BorderLayout());
-            JPanel statusPanel = new JPanel();
-            statusPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
-            add(statusPanel, BorderLayout.SOUTH);
-            statusPanel.setPreferredSize(new Dimension(getWidth(), 16));
-            statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.X_AXIS));
-            JLabel statusLabel = new JLabel("");
-            statusLabel.setHorizontalAlignment(SwingConstants.LEFT);
-            statusPanel.add(statusLabel);
             initMenu();
             initToolbar();
             connectToggles();
             model = new Model();
             Thread modelThread = new Thread(model);
+
             View view = new View(model);
             model.addObserver(view);
 
-            add(view);
+            JScrollPane scrollPane = new JScrollPane(view);
+            scrollPane.getVerticalScrollBar().setUnitIncrement(50);
             modelThread.start();
-
+            add(scrollPane);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -85,11 +77,8 @@ public class InitMainWindow extends MainFrame {
 
     }
 
-    public void onSettings(){
-//        JDialog dialog = new JDialog();
-//        dialog.setSize(600,600);
-//        dialog.add(new SplinePanel(model));
-//        dialog.setVisible(true);
+    public void onSettings() {
+        new SplineDialog(model);
     }
 
 }

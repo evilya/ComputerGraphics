@@ -1,4 +1,4 @@
-package ru.nsu.fit.g14203.evtushenko.model;
+package ru.nsu.fit.g14203.evtushenko.model.geom;
 
 public class Point2D {
     private double x, y;
@@ -14,10 +14,5 @@ public class Point2D {
 
     public double getY() {
         return y;
-    }
-
-    public void move(Point2D offset){
-        x += offset.getX();
-        y += offset.getY();
     }
 }
