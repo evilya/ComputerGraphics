@@ -222,7 +222,7 @@ public class Shape3D {
         return result;
     }
 
-    private List<Point2D> getSplinePoints(List<Point2D> nodePoints) {
+    public static List<Point2D> getSplinePoints(List<Point2D> nodePoints) {
         List<Point2D> points = new ArrayList<>();
 
         Matrix m = new Matrix(new double[][]{
@@ -283,5 +283,9 @@ public class Shape3D {
         lines.add(new Line<>(selfCenter,
                 selfCenter.shifted(0, 0, 0.5),
                 Color.BLUE));
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
     }
 }

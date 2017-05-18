@@ -4,11 +4,15 @@ import ru.nsu.fit.g14203.evtushenko.model.Axis;
 import ru.nsu.fit.g14203.evtushenko.model.Model;
 import ru.nsu.fit.g14203.evtushenko.model.ModelParameters;
 import ru.nsu.fit.g14203.evtushenko.model.PovConverter;
+import ru.nsu.fit.g14203.evtushenko.model.geom.Point2D;
 import ru.nsu.fit.g14203.evtushenko.model.geom.Point3D;
+import ru.nsu.fit.g14203.evtushenko.model.geom.Shape3D;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.lang.Math.PI;
 
@@ -72,6 +76,7 @@ public class SplineDialog extends JDialog {
                     cySpinner.setEnabled(false);
                     czSpinner.setEnabled(false);
                 }
+                splinePanel.repaint();
             }
         });
 
@@ -136,6 +141,48 @@ public class SplineDialog extends JDialog {
 
         rotateShapeCheckBox.addActionListener(e -> model.setRotateShape(((JCheckBox) e.getSource()).isSelected()));
 
+        addButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                List<Point2D> p = new ArrayList<>();
+                p.add(new Point2D(0, 0));
+                p.add(new Point2D(0, 1));
+                p.add(new Point2D(1, 0));
+                p.add(new Point2D(1, 1));
+                model.addShape(p);
+                shapeComboBox.addItem(shapeComboBox.getItemCount() + "");
+                shapeComboBox.setSelectedIndex(shapeComboBox.getItemCount() - 1);
+                model.update();
+            }
+        });
+
+        deleteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int selectedIndex = shapeComboBox.getSelectedIndex();
+                if (selectedIndex > 0) {
+                    model.deleteShape(selectedIndex - 1);
+                    shapeComboBox.removeItemAt(selectedIndex);
+                    shapeComboBox.setSelectedIndex(0);
+                    model.update();
+                }
+            }
+        });
+
+        colorButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Shape3D shape = model.getSelectedShape();
+                if (shape != null) {
+                    Color newColor = JColorChooser.showDialog(
+                            SplineDialog.this,
+                            "Choose Shape Color",
+                            shape.getColor());
+                    shape.setColor(newColor);
+                    model.update();
+                }
+            }
+        });
 
         pack();
         setVisible(true);
@@ -174,6 +221,7 @@ public class SplineDialog extends JDialog {
         cySpinner = new JSpinner(new SpinnerNumberModel(0, -100, 100, 1.));
         czSpinner = new JSpinner(new SpinnerNumberModel(0, -100, 100, 1.));
         splinePanel = new SplineEditView(model);
+        splinePanel.setFocusable(true);
         updatePositionSpinners(model.getChosenShapeIndex() != -1);
     }
 

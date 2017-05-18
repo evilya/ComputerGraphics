@@ -137,6 +137,11 @@ public class Model extends AbstractModel {
         scaler.update();
     }
 
+    public void deleteShape(int index) {
+        sourceShapes.remove(index);
+        scaler.update();
+    }
+
 
 
     private Line<Point2D> convertLine(Line<Point3D> line, boolean zoom) {
@@ -183,6 +188,7 @@ public class Model extends AbstractModel {
     public void updateShapes() {
         runInBackground(() -> {
             sourceShapes.forEach(Shape3D::update);
+            scaler.update();
             notifyObservers(EventType.REPAINT);
         });
     }
@@ -219,6 +225,13 @@ public class Model extends AbstractModel {
 
     public Point3D getChosenShapePosition() {
         return sourceShapes.get(chosenShapeIndex).getPosition();
+    }
+
+    public Shape3D getSelectedShape(){
+        if (chosenShapeIndex >= 0) {
+            return sourceShapes.get(chosenShapeIndex);
+        }
+        return null;
     }
 
 }
