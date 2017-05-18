@@ -32,4 +32,8 @@ public class SceneRotator {
     public Matrix getMatrix() {
         return sceneRotation;
     }
+
+    public void setMatrix(Matrix matrix){
+        sceneRotation = matrix;
+    }
 }

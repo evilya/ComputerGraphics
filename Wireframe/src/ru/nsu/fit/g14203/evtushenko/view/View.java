@@ -66,7 +66,7 @@ public class View extends JPanel implements Observer {
                     height,
                     BufferedImage.TYPE_INT_ARGB);
             Graphics2D graphics = image.createGraphics();
-            graphics.setColor(Color.WHITE);
+            graphics.setColor(model.getBackgroundColor());
             graphics.fillRect(0, 0, width, height);
             shapes.stream()
                     .flatMap(s -> {

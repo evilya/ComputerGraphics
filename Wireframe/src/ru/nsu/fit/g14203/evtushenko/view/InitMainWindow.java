@@ -9,6 +9,7 @@ import java.awt.event.KeyEvent;
 public class InitMainWindow extends MainFrame {
 
     private final Model model;
+    private final JScrollPane scrollPane;
 
     public InitMainWindow() {
         super(800, 800, "Wireframe");
@@ -22,7 +23,7 @@ public class InitMainWindow extends MainFrame {
             View view = new View(model);
             model.addObserver(view);
 
-            JScrollPane scrollPane = new JScrollPane(view);
+            scrollPane = new JScrollPane(view);
             scrollPane.getVerticalScrollBar().setUnitIncrement(50);
             modelThread.start();
             add(scrollPane);
@@ -43,7 +44,9 @@ public class InitMainWindow extends MainFrame {
         toolBar.setFloatable(false);
         add(toolBar, BorderLayout.NORTH);
         addToolBarButton("File/Open");
+        addToolBarButton("File/Save");
         addToolBarButton("File/Settings");
+        addToolBarButton("File/Init");
         addToolBarSeparator();
         addToolBarButton("Help/About");
         addToolBarButton("File/Exit");
@@ -52,7 +55,9 @@ public class InitMainWindow extends MainFrame {
     private void initMenu() throws NoSuchMethodException {
         addSubMenu("File", KeyEvent.VK_F);
         addMenuItem("File/Open", "Open", KeyEvent.VK_O, "open.png", "onOpen");
+        addMenuItem("File/Save", "Save", KeyEvent.VK_O, "save.png", "onSave");
         addMenuItem("File/Settings", "Settings", KeyEvent.VK_O, "settings.png", "onSettings");
+        addMenuItem("File/Init", "Init", KeyEvent.VK_O, "clear.png", "onInit");
         addMenuSeparator("File");
         addMenuItem("File/Exit", "Exit", KeyEvent.VK_X, "exit.png", "onExit");
 
@@ -74,11 +79,35 @@ public class InitMainWindow extends MainFrame {
     }
 
     public void onOpen() {
-
+        JFileChooser fileChooser = new JFileChooser("FIT_14203_Evtushenko_Ilya_WireFrame_Data");
+        int res = fileChooser.showDialog(this, "Open");
+        if (res == JFileChooser.APPROVE_OPTION) {
+            try {
+                model.loadFromFile(fileChooser.getSelectedFile());
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Can not open file");
+            }
+        }
+        scrollPane.revalidate();
     }
 
     public void onSettings() {
         new SplineDialog(model);
     }
 
+    public void onSave() {
+        JFileChooser fileChooser = new JFileChooser("FIT_14203_Evtushenko_Ilya_Wireframe_Data");
+        int res = fileChooser.showDialog(this, "Save");
+        if (res == JFileChooser.APPROVE_OPTION) {
+            try {
+                model.saveToFile(fileChooser.getSelectedFile());
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Can not open file");
+            }
+        }
+    }
+
+    public void onInit() {
+        model.init();
+    }
 }

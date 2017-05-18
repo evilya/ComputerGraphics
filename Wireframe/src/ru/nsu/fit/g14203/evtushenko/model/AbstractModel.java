@@ -2,6 +2,7 @@ package ru.nsu.fit.g14203.evtushenko.model;
 
 import ru.nsu.fit.g14203.evtushenko.Observable;
 
+import java.util.ConcurrentModificationException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 

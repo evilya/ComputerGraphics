@@ -288,4 +288,12 @@ public class Shape3D {
     public void setColor(Color color) {
         this.color = color;
     }
+
+    public void setRotation(Matrix rotation) {
+        this.rotation = rotation;
+    }
+
+    public Matrix getRotation() {
+        return rotation;
+    }
 }

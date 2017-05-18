@@ -33,7 +33,7 @@ public class SplineEditView extends JPanel {
                 super.mousePressed(e);
                 for (int i = 0; i < viewPoints.size(); i++) {
                     Point point = viewPoints.get(i);
-                    if (Math.sqrt(Math.pow(point.x - e.getX(), 2) + Math.pow(point.y - e.getY(), 2)) < 3) {
+                    if (Math.sqrt(Math.pow(point.x - e.getX(), 2) + Math.pow(point.y - e.getY(), 2)) < 4) {
                         selectedPoint = i;
                         return;
                     }
@@ -128,8 +128,8 @@ public class SplineEditView extends JPanel {
         for (Point2D point : points) {
             int x = pointToPixel(Axis.X, point.getX());
             int y = pointToPixel(Axis.Y, point.getY());
-            viewPoints.add(new Point(x + 3, y + 3));
-            g.drawOval(x, y, 6, 6);
+            viewPoints.add(new Point(x + 4, y + 4));
+            g.drawOval(x, y, 8, 8);
         }
     }
 
@@ -145,10 +145,10 @@ public class SplineEditView extends JPanel {
 
     private void drawBase(List<Point2D> points, Graphics g) {
         for (int i = 0; i < points.size() - 1; i++) {
-            int x1 = pointToPixel(Axis.X, points.get(i).getX()) + 3;
-            int y1 = pointToPixel(Axis.Y, points.get(i).getY()) + 3;
-            int x2 = pointToPixel(Axis.X, points.get(i + 1).getX()) + 3;
-            int y2 = pointToPixel(Axis.Y, points.get(i + 1).getY()) + 3;
+            int x1 = pointToPixel(Axis.X, points.get(i).getX()) + 4;
+            int y1 = pointToPixel(Axis.Y, points.get(i).getY()) + 4;
+            int x2 = pointToPixel(Axis.X, points.get(i + 1).getX()) + 4;
+            int y2 = pointToPixel(Axis.Y, points.get(i + 1).getY()) + 4;
             g.drawLine(x1, y1, x2, y2);
         }
     }
