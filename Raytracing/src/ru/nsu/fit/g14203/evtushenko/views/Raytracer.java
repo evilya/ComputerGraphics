@@ -107,8 +107,8 @@ public class Raytracer extends Thread {
 
         Matrix startPos = new Matrix(1, 3, new double[]{0, 0, 0});
 
-        int step = 1;
-        int rays = 2;
+        int step = 2;
+        int rays = 1;
         double offset;
 
         offset = (double) step / 2. / rays;
